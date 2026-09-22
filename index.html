@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FTC Mechanism Vault & Historical Archive | CAD & Video Repository</title>
 
-    <link rel="icon" type="image/png" href="FTCMechanismVault.png">
+    <link rel="icon" type="image/png" href="https://placehold.co/32x32/2563EB/FFFFFF?text=FTC">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,6 +44,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
 
     <style>
         body {
@@ -234,7 +237,7 @@
                             <h4 class="text-xs font-bold text-white truncate">Floating Roller Intake</h4>
                         </div>
 
-                        <div class="fan-card-2 absolute w-64 p-4 bg-obsidian border-2 border-accentBlue/80 rounded-2xl shadow-2xl space-y-2 z-20 glow-blue-sm">
+                        <div class="fan-card-2 absolute w-64 p-4 bg-obsidian border-2 border-accentBlue/80 rounded-2xl shadow-2xl z-20 glow-blue-sm">
                             <div class="h-32 rounded-xl bg-pitch flex items-center justify-center border border-cardBorder relative overflow-hidden">
                                 <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80" alt="3D CAD and Video Media" class="w-full h-full object-cover opacity-80">
                                 <span class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-accentBlue text-white flex items-center gap-1">
@@ -380,14 +383,14 @@
                         </div>
                     </div>
 
-                    <!-- Total Website Views Visual Stat Block -->
+                    <!-- Live Firebase Website Views Visual Stat Block -->
                     <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5 relative overflow-hidden group hover:border-emerald-500/40 transition-all">
                         <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl shrink-0 glow-blue-sm">
                             <i class="fa-solid fa-eye animate-pulse"></i>
                         </div>
                         <div>
                             <div id="statWebsiteViews" class="text-xl sm:text-2xl font-black text-white font-mono flex items-center gap-1.5">
-                                <span>128.4K</span>
+                                <span>0</span>
                                 <span class="flex h-2 w-2 relative">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -395,6 +398,7 @@
                             </div>
                             <div class="text-[11px] font-bold text-slate-400 flex items-center gap-1">
                                 <span>Total Website Views</span>
+                                <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/30">LIVE</span>
                             </div>
                         </div>
                     </div>
@@ -437,13 +441,18 @@
                     <button data-category="Outtake & Lift" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
                         <i class="fa-solid fa-arrow-up-from-bracket text-amber-400 mr-1.5"></i> Outtakes & Lifts
                     </button>
-                    <!-- Launchers Tab with Visual Catapult Graphic Icon -->
-                    <button data-category="Shooter / Launcher" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500 flex items-center gap-1.5">
-                        <div class="w-5 h-5 rounded-md bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-xs">
-                            <i class="fa-solid fa-arrows-to-circle"></i>
-                        </div>
-                        <span>Launchers</span>
+
+                    <button data-category="Shooter / Launcher" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
+                        <svg class="inline-block w-4 h-4 mr-1.5 align-middle text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 19h18" />
+                            <path d="M5 19l4-8" />
+                            <path d="M12 19l-3-8" />
+                            <path d="M9 11l9-5" />
+                            <circle cx="18" cy="6" r="2" />
+                        </svg>
+                        Launchers
                     </button>
+
                     <button data-category="Transfer" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
                         <i class="fa-solid fa-arrows-rotate text-purple-400 mr-1.5"></i> Transfers
                     </button>
@@ -509,11 +518,17 @@
                     </div>
                     <h2 id="modalTitle" class="text-lg sm:text-xl font-bold text-white tracking-tight"></h2>
                 </div>
-                <button id="closeDetailModalBtn" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-cardBorder transition-all">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="deleteMechanismBtn" class="p-2 rounded-xl text-rose-500 hover:text-white hover:bg-rose-500/20 transition-all" title="Delete Mechanism Globally">
+                        <i class="fa-solid fa-trash text-lg"></i>
+                    </button>
+                    <button id="closeDetailModalBtn" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-cardBorder transition-all">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
             </div>
 
+            <!-- Header Tabs with Conditional 3D CAD Tab -->
             <div class="px-5 pt-3 bg-pitch/40 border-b border-cardBorder flex items-center gap-4 text-xs font-mono">
                 <button id="tabMediaBtn" class="px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2">
                     <i class="fa-solid fa-play"></i> Video / Media
@@ -599,7 +614,7 @@
 
     <!-- Submit Mechanism Modal -->
     <div id="submitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
-        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[95vh] overflow-y-auto">
             <button id="closeSubmitModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
@@ -648,6 +663,7 @@
                     <div>
                         <label class="block text-xs font-mono text-slate-300 mb-1">3D CAD Preset Model</label>
                         <select id="subCad3dType" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                            <option value="NONE">No 3D CAD Preset Model</option>
                             <option value="ELEVATOR">Viper Slide Linear Elevator</option>
                             <option value="CATAPULT">Tensioned Catapult Launcher</option>
                             <option value="SPINTAKE">Active Spintake Roller</option>
@@ -658,11 +674,11 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Media Link (YouTube / Instagram) *</label>
-                        <input type="url" id="subVideoUrl" required placeholder="https://youtube.com or instagram.com..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Media Link (YouTube / Instagram)</label>
+                        <input type="url" id="subVideoUrl" placeholder="https://youtube.com or instagram.com..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Onshape / CAD URL (Optional)</label>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Onshape / CAD URL</label>
                         <input type="url" id="subCadUrl" placeholder="https://cad.onshape.com/..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
                     </div>
                 </div>
@@ -701,7 +717,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ftc-mechanism-vault-prod';
         
@@ -781,6 +797,7 @@
                 youtubeId: 'FnioJBsmkF4',
                 mediaUrl: 'https://www.youtube.com/watch?v=FnioJBsmkF4',
                 hasCad: false,
+                cad3dType: 'NONE',
                 specs: ['Active Spintake with surgical tubing', 'Dual-stage continuous linear slides', 'Dual Specimen Claw'],
                 software: 'Custom Motion Profiling PIDF for rapid linear deceleration without spilling samples.'
             },
@@ -847,6 +864,7 @@
                 youtubeId: '_JU4qY0d6T0',
                 mediaUrl: 'https://www.youtube.com/watch?v=_JU4qY0d6T0',
                 hasCad: false,
+                cad3dType: 'NONE',
                 specs: ['AndyMark Compliant Wheels', 'Virtual 4-Bar Pivot Linkage', 'REV Core Hex Motor'],
                 software: 'Heading stabilization IMU loop keeps robot steady while sweeping freight.'
             },
@@ -879,6 +897,7 @@
                 youtubeId: '71u27jwLz_U',
                 mediaUrl: 'https://www.youtube.com/watch?v=71u27jwLz_U',
                 hasCad: false,
+                cad3dType: 'NONE',
                 specs: ['Active Side Compliant Wheel Intake', 'Continuous Cable Slide', 'Dual Foundation Hooks'],
                 software: 'Sub-millimeter dead-reckoning odometry tracking with rapid path planning.'
             }
@@ -909,6 +928,263 @@
         let scene3d, camera3d, renderer3d, controls3d, currentMesh3d, animReq3d;
         let isWireframe3d = false;
 
+        // --- Helper to determine effective 3D CAD type based on link or type ---
+        function getEffectiveCadType(mech) {
+            if (!mech) return 'SPINTAKE';
+            if (mech.cad3dType && mech.cad3dType !== 'NONE') return mech.cad3dType;
+            
+            const url = (mech.cadUrl || mech.mediaUrl || '').toLowerCase();
+            const title = (mech.title || '').toLowerCase();
+
+            if (url.includes('elevator') || title.includes('elevator') || title.includes('slide') || title.includes('lift')) return 'ELEVATOR';
+            if (url.includes('catapult') || title.includes('catapult') || title.includes('launcher') || title.includes('shooter')) return 'CATAPULT';
+            if (url.includes('claw') || title.includes('claw') || title.includes('wrist') || title.includes('grabber')) return 'CLAW';
+            return 'SPINTAKE';
+        }
+
+        function hasValidMedia(mech) {
+            if (!mech) return false;
+            if (mech.youtubeId) return true;
+            const mediaUrl = (mech.mediaUrl || '').trim();
+            if (!mediaUrl) return false;
+            try {
+                const url = new URL(mediaUrl);
+                return url.hostname.includes('youtube.com') ||
+                    url.hostname === 'youtu.be' ||
+                    (url.hostname.includes('instagram.com') && url.pathname !== '/');
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function getCadFileType(cadUrl) {
+            try {
+                const path = new URL(cadUrl).pathname.toLowerCase();
+                if (path.endsWith('.glb') || path.endsWith('.gltf')) return 'gltf';
+                if (path.endsWith('.obj')) return 'obj';
+                if (path.endsWith('.stl')) return 'stl';
+            } catch (error) {
+                return '';
+            }
+            return '';
+        }
+
+        function loadCadFile(container, cadUrl, fileType) {
+            const loading = document.createElement('div');
+            loading.className = 'absolute inset-0 flex items-center justify-center text-xs text-slate-400 font-mono';
+            loading.innerText = 'Loading CAD file...';
+            container.appendChild(loading);
+
+            const addModel = (model) => {
+                loading.remove();
+                const object = model.scene || model;
+                object.traverse((child) => {
+                    if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x2563eb, metalness: 0.45, roughness: 0.3 });
+                });
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+                const scale = 3 / Math.max(size.x, size.y, size.z, 0.001);
+                object.position.sub(center).multiplyScalar(scale);
+                object.scale.setScalar(scale);
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x020617);
+                const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 1000);
+                camera.position.set(4, 3, 5);
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                container.appendChild(renderer.domElement);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const light = new THREE.DirectionalLight(0x06b6d4, 1.2);
+                light.position.set(5, 8, 5);
+                scene.add(light, object);
+                const animate = () => {
+                    animReq3d = requestAnimationFrame(animate);
+                    object.rotation.y += 0.006;
+                    renderer.render(scene, camera);
+                };
+                animate();
+            };
+
+            const onError = () => {
+                loading.innerText = 'CAD file could not be loaded. Use Launch CAD to open the source file.';
+            };
+            if (fileType === 'gltf' && THREE.GLTFLoader) new THREE.GLTFLoader().load(cadUrl, addModel, undefined, onError);
+            else if (fileType === 'obj' && THREE.OBJLoader) new THREE.OBJLoader().load(cadUrl, addModel, undefined, onError);
+            else if (fileType === 'stl' && THREE.STLLoader) new THREE.STLLoader().load(cadUrl, (geometry) => addModel(new THREE.Mesh(geometry)), undefined, onError);
+            else loading.innerText = 'This CAD format opens from the source link below.';
+        }
+
+        // --- 3D WebGL Viewer Logic ---
+        function init3dViewer(containerId, cadType = 'SPINTAKE') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            // Clean up existing scene/animation frame
+            if (animReq3d) cancelAnimationFrame(animReq3d);
+            container.innerHTML = '';
+
+            const width = container.clientWidth || 600;
+            const height = container.clientHeight || 340;
+
+            // Scene & Camera
+            scene3d = new THREE.Scene();
+            scene3d.background = new THREE.Color(0x020617);
+
+            camera3d = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera3d.position.set(4, 3, 5);
+
+            // Renderer
+            renderer3d = new THREE.WebGLRenderer({ antialias: true });
+            renderer3d.setSize(width, height);
+            renderer3d.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer3d.domElement);
+
+            // Orbit Controls
+            if (typeof THREE.OrbitControls !== 'undefined') {
+                controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
+                controls3d.enableDamping = true;
+                controls3d.dampingFactor = 0.05;
+            }
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene3d.add(ambientLight);
+
+            const dirLight1 = new THREE.DirectionalLight(0x2563eb, 1.2);
+            dirLight1.position.set(5, 10, 7);
+            scene3d.add(dirLight1);
+
+            const dirLight2 = new THREE.DirectionalLight(0x06b6d4, 0.8);
+            dirLight2.position.set(-5, -5, -5);
+            scene3d.add(dirLight2);
+
+            // Grid Floor
+            const gridHelper = new THREE.GridHelper(10, 20, 0x2563eb, 0x1e293b);
+            gridHelper.position.y = -1;
+            scene3d.add(gridHelper);
+
+            // Create 3D Parametric CAD Geometry Preset
+            const group = new THREE.Group();
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x2563eb,
+                metalness: 0.5,
+                roughness: 0.2,
+                wireframe: isWireframe3d
+            });
+
+            if (cadType === 'ELEVATOR') {
+                const railGeo = new THREE.BoxGeometry(0.2, 3, 0.2);
+                const rail1 = new THREE.Mesh(railGeo, material); rail1.position.x = -0.8;
+                const rail2 = new THREE.Mesh(railGeo, material); rail2.position.x = 0.8;
+                const carGeo = new THREE.BoxGeometry(1.4, 0.6, 0.4);
+                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xf59e0b, wireframe: isWireframe3d }));
+                carriage.position.y = 0.5;
+                group.add(rail1, rail2, carriage);
+            } else if (cadType === 'CATAPULT') {
+                const baseGeo = new THREE.BoxGeometry(2, 0.2, 1.5);
+                const base = new THREE.Mesh(baseGeo, material);
+                const armGeo = new THREE.CylinderGeometry(0.08, 0.08, 2.5);
+                const arm = new THREE.Mesh(armGeo, material);
+                arm.rotation.z = -Math.PI / 4;
+                arm.position.set(0.5, 0.8, 0);
+                group.add(base, arm);
+            } else if (cadType === 'CLAW') {
+                const wristGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+                const wrist = new THREE.Mesh(wristGeo, material);
+                const fingerGeo = new THREE.BoxGeometry(0.15, 1.2, 0.2);
+                const f1 = new THREE.Mesh(fingerGeo, material); f1.position.set(-0.3, 0.8, 0.3); f1.rotation.z = -0.2;
+                const f2 = new THREE.Mesh(fingerGeo, material); f2.position.set(0.3, 0.8, 0.3); f2.rotation.z = 0.2;
+                group.add(wrist, f1, f2);
+            } else {
+                const shaftGeo = new THREE.CylinderGeometry(0.15, 0.15, 3, 32);
+                const shaft = new THREE.Mesh(shaftGeo, material);
+                shaft.rotation.z = Math.PI / 2;
+                for (let i = -1; i <= 1; i += 0.5) {
+                    const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 24);
+                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x10b981, wireframe: isWireframe3d });
+                    const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                    wheel.rotation.z = Math.PI / 2;
+                    wheel.position.x = i;
+                    group.add(wheel);
+                }
+                group.add(shaft);
+            }
+
+            currentMesh3d = group;
+            scene3d.add(currentMesh3d);
+
+            function animate() {
+                animReq3d = requestAnimationFrame(animate);
+                if (currentMesh3d) currentMesh3d.rotation.y += 0.008;
+                if (controls3d) controls3d.update();
+                renderer3d.render(scene3d, camera3d);
+            }
+            animate();
+        }
+
+        function renderCadThumbnailCanvas(canvas, cadType) {
+            const width = canvas.width || 300;
+            const height = canvas.height || 180;
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x070d19);
+
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(3.5, 2.5, 4);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(width, height, false);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0x2563eb, 1.2);
+            dirLight.position.set(5, 8, 5);
+            scene.add(dirLight);
+
+            const gridHelper = new THREE.GridHelper(8, 12, 0x2563eb, 0x1e293b);
+            gridHelper.position.y = -1;
+            scene.add(gridHelper);
+
+            const group = new THREE.Group();
+            const material = new THREE.MeshStandardMaterial({ color: 0x2563eb, metalness: 0.4, roughness: 0.3 });
+
+            if (cadType === 'ELEVATOR') {
+                const railGeo = new THREE.BoxGeometry(0.2, 2.5, 0.2);
+                const r1 = new THREE.Mesh(railGeo, material); r1.position.x = -0.6;
+                const r2 = new THREE.Mesh(railGeo, material); r2.position.x = 0.6;
+                const carGeo = new THREE.BoxGeometry(1.1, 0.5, 0.3);
+                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
+                group.add(r1, r2, carriage);
+            } else if (cadType === 'CATAPULT') {
+                const base = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.2, 1.2), material);
+                const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2), material);
+                arm.rotation.z = -Math.PI / 4;
+                arm.position.set(0.3, 0.6, 0);
+                group.add(base, arm);
+            } else if (cadType === 'CLAW') {
+                const wrist = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), material);
+                const f1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1, 0.18), material); f1.position.set(-0.25, 0.6, 0.2); f1.rotation.z = -0.2;
+                const f2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1, 0.18), material); f2.position.set(0.25, 0.6, 0.2); f2.rotation.z = 0.2;
+                group.add(wrist, f1, f2);
+            } else {
+                const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.5, 16), material);
+                shaft.rotation.z = Math.PI / 2;
+                for (let i = -0.8; i <= 0.8; i += 0.5) {
+                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 16), new THREE.MeshStandardMaterial({ color: 0x10b981 }));
+                    wheel.rotation.z = Math.PI / 2;
+                    wheel.position.x = i;
+                    group.add(wheel);
+                }
+                group.add(shaft);
+            }
+
+            group.rotation.y = 0.5;
+            scene.add(group);
+            renderer.render(scene, camera);
+        }
+
         function switchView(targetView) {
             currentView = targetView;
             const homeView = document.getElementById('homeView');
@@ -931,6 +1207,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toLocaleString();
+        }
+
         async function initFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -942,6 +1224,8 @@
                 } else {
                     await signInAnonymously(auth);
                 }
+
+                setupLiveViewCounter();
 
                 const mechsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'mechanisms');
                 onSnapshot(mechsColRef, (snapshot) => {
@@ -967,13 +1251,43 @@
             } catch (err) {
                 console.warn("Firebase initialization fallback:", err);
                 loadLocalData();
+                setupLocalViewCounter();
             }
+        }
+
+        async function setupLiveViewCounter() {
+            const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'analytics');
+            onSnapshot(statsDocRef, (docSnap) => {
+                const views = docSnap.exists() ? (docSnap.data().websiteViews || 0) : 0;
+                const viewsEl = document.querySelector('#statWebsiteViews span');
+                if (viewsEl) viewsEl.innerText = formatNumber(views);
+            });
+
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const statsDoc = await transaction.get(statsDocRef);
+                    if (!statsDoc.exists()) {
+                        transaction.set(statsDocRef, { websiteViews: 0, viewCounterReset: true });
+                    } else if (!statsDoc.data().viewCounterReset) {
+                        transaction.update(statsDocRef, { websiteViews: 0, viewCounterReset: true });
+                    } else {
+                        transaction.update(statsDocRef, { websiteViews: (statsDoc.data().websiteViews || 0) + 1 });
+                    }
+                });
+            } catch (e) {
+                setDoc(statsDocRef, { websiteViews: 0, viewCounterReset: true }, { merge: true });
+            }
+        }
+
+        function setupLocalViewCounter() {
+            const localViews = parseInt(localStorage.getItem('ftc_vault_views') || '0', 10);
+            const viewsEl = document.querySelector('#statWebsiteViews span');
+            if (viewsEl) viewsEl.innerText = formatNumber(localViews);
         }
 
         async function seedInitialData(colRef) {
             mechanismsData = [...initialMechanisms];
             filterAndRenderGrid();
-
             for (const mech of initialMechanisms) {
                 try {
                     await setDoc(doc(colRef, mech.id), mech);
@@ -1013,9 +1327,8 @@
 
             document.querySelectorAll('.timeline-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const key = e.currentTarget.getAttribute('data-season-key');
-                    activeSeasonKey = key;
-                    const seasonObj = seasonsList.find(s => s.key === key);
+                    activeSeasonKey = e.currentTarget.getAttribute('data-season-key');
+                    const seasonObj = seasonsList.find(s => s.key === activeSeasonKey);
                     document.getElementById('activeSeasonBadge').innerText = `Active: ${seasonObj ? seasonObj.label : 'All Seasons'}`;
                     renderSeasonTimeline();
                     filterAndRenderGrid();
@@ -1050,586 +1363,328 @@
             }
         }
 
+        function openDetailModal(mechId) {
+            const m = mechanismsData.find(item => item.id === mechId);
+            if (!m) return;
+            currentModalMech = m;
+
+            document.getElementById('modalTeamTag').innerText = m.team;
+            document.getElementById('modalSeasonTag').innerText = m.season;
+            document.getElementById('modalCategoryTag').innerText = m.category;
+            document.getElementById('modalTitle').innerText = m.title;
+
+            // Determine visibility & states of tabs
+            const hasMedia = hasValidMedia(m);
+            const tabMediaBtn = document.getElementById('tabMediaBtn');
+            const tabCadBtn = document.getElementById('tabCadBtn');
+
+            if (hasMedia) {
+                tabMediaBtn.classList.remove('hidden');
+                tabMediaBtn.style.display = 'flex';
+                
+                const mediaContainer = document.getElementById('modalMediaContainer');
+                if (m.youtubeId) {
+                    mediaContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${m.youtubeId}?autoplay=1" title="${m.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                } else {
+                    mediaContainer.innerHTML = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-obsidian">
+                            <i class="fa-brands fa-instagram text-5xl text-pink-500 mb-3"></i>
+                            <h4 class="text-sm font-bold text-white mb-1">Instagram Media Clip</h4>
+                            <p class="text-xs text-slate-400 max-w-sm mb-4">View this mechanism showcase video directly on Instagram.</p>
+                            <a href="${m.mediaUrl}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg">
+                                <span>Open in Instagram</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                tabMediaBtn.classList.add('hidden');
+                tabMediaBtn.style.display = 'none';
+                document.getElementById('modalMediaContainer').innerHTML = '';
+            }
+
+            if (m.hasCad) {
+                tabCadBtn.classList.remove('hidden');
+                tabCadBtn.style.display = 'flex';
+            } else {
+                tabCadBtn.classList.add('hidden');
+                tabCadBtn.style.display = 'none';
+            }
+
+            // Specs and text population
+            const specsList = document.getElementById('modalHardwareSpecs');
+            specsList.innerHTML = (m.specs || []).map(s => `<li>${s}</li>`).join('');
+            document.getElementById('modalSoftwareNotes').innerText = m.software || 'Standard TeleOp & Autonomous driving control setup.';
+
+            const cadContainer = document.getElementById('modalCadContainer');
+            if (m.hasCad && m.cadUrl) {
+                cadContainer.classList.remove('hidden');
+                document.getElementById('modalCadLink').href = m.cadUrl;
+            } else {
+                cadContainer.classList.add('hidden');
+            }
+            
+            const directLink = hasMedia ? m.mediaUrl : (m.hasCad ? m.cadUrl : '#');
+            document.getElementById('modalDirectMediaLink').href = directLink || '#';
+            document.getElementById('modalDirectMediaLink').innerHTML = hasMedia
+                ? '<i class="fa-solid fa-arrow-up-right-from-square text-blue-400"></i> Open Original Media'
+                : '<i class="fa-solid fa-arrow-up-right-from-square text-blue-400"></i> Open CAD File';
+
+            // Reset Tab UI selection based on availability
+            if (hasMedia) {
+                document.getElementById('modalMediaContainer').classList.remove('hidden');
+                document.getElementById('modal3dCanvasContainer').classList.add('hidden');
+                tabMediaBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+            } else if (m.hasCad) {
+                document.getElementById('modalMediaContainer').classList.add('hidden');
+                document.getElementById('modal3dCanvasContainer').classList.remove('hidden');
+                tabCadBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                tabMediaBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+                setTimeout(() => document.getElementById('tabCadBtn').click(), 10); // Automatically build CAD view
+            }
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
         function filterAndRenderGrid() {
             const filtered = mechanismsData.filter(m => {
                 const matchesSeason = activeSeasonKey === 'ALL' || m.seasonKey === activeSeasonKey;
                 const matchesCategory = activeCategory === 'ALL' || m.category === activeCategory;
                 const matchesCad = !showCadOnly || m.hasCad;
-
-                const query = searchQuery.toLowerCase().trim();
-                const matchesSearch = !query || 
-                    m.title.toLowerCase().includes(query) ||
-                    m.team.toLowerCase().includes(query) ||
-                    m.season.toLowerCase().includes(query) ||
-                    m.category.toLowerCase().includes(query) ||
-                    (m.specs && m.specs.some(s => s.toLowerCase().includes(query)));
+                
+                const q = searchQuery.toLowerCase().trim();
+                const matchesSearch = !q || 
+                    m.team.toLowerCase().includes(q) || 
+                    m.title.toLowerCase().includes(q) || 
+                    m.season.toLowerCase().includes(q) ||
+                    (m.specs && m.specs.some(s => s.toLowerCase().includes(q)));
 
                 return matchesSeason && matchesCategory && matchesCad && matchesSearch;
             });
 
-            document.getElementById('resultsCount').innerText = filtered.length;
-            updateCounterStats(filtered.length);
-
             const grid = document.getElementById('mechanismGrid');
             const emptyState = document.getElementById('emptyState');
+            document.getElementById('resultsCount').innerText = filtered.length;
+
+            updateCounterStats(filtered.length);
 
             if (filtered.length === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
-            } else {
-                emptyState.classList.add('hidden');
             }
 
+            emptyState.classList.add('hidden');
             grid.innerHTML = filtered.map(m => {
-                const isBookmarked = bookmarkedIds.has(m.id);
+                const isSaved = bookmarkedIds.has(m.id);
                 const isCompared = compareIds.has(m.id);
 
-                let mediaBadge = '';
-                if (m.hasCad) {
-                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-accentBlue text-white flex items-center gap-1 shadow-md"><i class="fa-solid fa-cube"></i> 3D CAD MODEL</span>`;
-                } else if (m.youtubeId) {
-                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-600 text-white flex items-center gap-1"><i class="fa-brands fa-youtube"></i> YOUTUBE</span>`;
-                } else if (m.mediaUrl && m.mediaUrl.includes('instagram')) {
-                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-pink-600 text-white flex items-center gap-1"><i class="fa-brands fa-instagram"></i> INSTAGRAM</span>`;
-                } else {
-                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-200 flex items-center gap-1"><i class="fa-solid fa-link"></i> MEDIA LINK</span>`;
-                }
-
-                let thumbnailHtml = '';
-                const isInstagram = m.mediaType === 'Instagram' || (m.mediaUrl && m.mediaUrl.includes('instagram'));
-
-                if (m.thumbnailUrl) {
-                    thumbnailHtml = `<img src="${m.thumbnailUrl}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85 group-hover:opacity-100" onerror="this.src='https://placehold.co/600x337/0f172a/2563EB?text=FTC+Mechanism'">`;
-                } else if (m.youtubeId) {
-                    const thumbUrl = `https://img.youtube.com/vi/${m.youtubeId}/hqdefault.jpg`;
-                    thumbnailHtml = `<img src="${thumbUrl}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85 group-hover:opacity-100" onerror="this.src='https://placehold.co/600x337/0f172a/2563EB?text=FTC+Mechanism'">`;
-                } else if (isInstagram) {
-                    thumbnailHtml = `
-                        <div class="w-full h-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex flex-col items-center justify-center relative p-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                            <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
-                            <div class="relative z-10 flex flex-col items-center text-center space-y-1.5">
-                                <div class="w-11 h-11 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-2xl shadow-xl border border-white/30 group-hover:scale-110 transition-transform">
-                                    <i class="fa-brands fa-instagram"></i>
-                                </div>
-                                <span class="text-[10px] font-mono font-black tracking-wider text-white uppercase bg-black/40 px-2.5 py-0.5 rounded-full border border-white/20 shadow-sm">Instagram Reel</span>
-                                <span class="text-[11px] font-bold text-white/90 max-w-[180px] truncate">${m.team}</span>
-                            </div>
-                            <div class="absolute bottom-2.5 right-2.5 z-10 text-white/90 text-[10px] font-mono font-bold flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md border border-white/10">
-                                <i class="fa-solid fa-play text-[9px] text-pink-400"></i> Watch Reel
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    thumbnailHtml = `
-                        <div class="w-full h-full bg-gradient-to-br from-slate-900 via-cyberSlate to-accentDarkBlue flex flex-col items-center justify-center relative p-4 group-hover:scale-105 transition-transform duration-300">
-                            <div class="w-10 h-10 rounded-2xl bg-accentBlue/20 border border-accentBlue/40 flex items-center justify-center text-accentBlue text-xl mb-1.5">
-                                <i class="fa-solid fa-cube"></i>
-                            </div>
-                            <span class="text-xs font-mono font-bold text-slate-300 max-w-[180px] truncate text-center">${m.title}</span>
-                        </div>
-                    `;
-                }
-
-                const sObj = seasonsList.find(s => s.key === m.seasonKey);
-                const seasonIcon = sObj ? sObj.icon : (m.seasonIcon || 'fa-solid fa-layer-group');
-
                 return `
-                    <div class="mech-card bg-cardBg border border-cardBorder hover:border-accentBlue/60 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col cursor-pointer group" data-id="${m.id}">
-                        <div class="relative aspect-video bg-black overflow-hidden">
-                            ${thumbnailHtml}
-                            <div class="absolute top-2.5 left-2.5 flex items-center gap-2 z-10">
-                                ${mediaBadge}
-                            </div>
-                            <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
-                                <button class="card-compare-btn p-2 rounded-xl bg-pitch/80 hover:bg-pitch text-slate-300 hover:text-accentBlue transition-colors backdrop-blur-sm" data-id="${m.id}" title="Compare Mechanism">
-                                    <i class="fa-solid fa-code-compare text-sm ${isCompared ? 'text-accentBlue font-bold' : ''}"></i>
-                                </button>
-                                <button class="card-bookmark-btn p-2 rounded-xl bg-pitch/80 hover:bg-pitch text-slate-300 hover:text-accentAmber transition-colors backdrop-blur-sm" data-id="${m.id}" title="Bookmark Mechanism">
-                                    <i class="${isBookmarked ? 'fa-solid text-accentAmber' : 'fa-regular'} fa-bookmark text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                            <div>
-                                <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-1.5">
-                                    <span class="text-accentBlue font-bold truncate max-w-[150px]">${m.team}</span>
-                                    <span class="text-[10px] bg-pitch px-2 py-0.5 rounded border border-cardBorder flex items-center gap-1.5"><i class="${seasonIcon} text-accentBlue"></i> ${m.seasonKey}</span>
+                    <div class="group bg-cardBg border border-cardBorder hover:border-accentBlue/60 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="relative aspect-video bg-pitch overflow-hidden cursor-pointer modal-trigger" data-id="${m.id}">
+                                ${m.hasCad ? `
+                                    <canvas id="thumb-canvas-${m.id}" width="300" height="180" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></canvas>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-pitch via-transparent to-transparent"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div class="w-12 h-12 rounded-full bg-accentBlue/90 text-white flex items-center justify-center shadow-lg glow-blue-sm">
+                                            <i class="fa-solid fa-cube text-base"></i>
+                                        </div>
+                                    </div>
+                                ` : m.youtubeId ? `
+                                    <img src="https://img.youtube.com/vi/${m.youtubeId}/hqdefault.jpg" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-pitch via-transparent to-transparent"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-12 h-12 rounded-full bg-accentBlue/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform glow-blue-sm">
+                                            <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                                        </div>
+                                    </div>
+                                ` : `
+                                    <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-obsidian to-pitch text-pink-500 p-4">
+                                        <i class="fa-brands fa-instagram text-4xl mb-2"></i>
+                                        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Instagram Reel</span>
+                                    </div>
+                                `}
+
+                                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-pitch/80 backdrop-blur-md text-accentBlue border border-cardBorder">
+                                        ${m.category}
+                                    </span>
+                                    ${m.hasCad ? `
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-accentBlue text-white shadow-sm flex items-center gap-1">
+                                            <i class="fa-solid fa-cube text-[9px]"></i> 3D CAD
+                                        </span>
+                                    ` : ''}
                                 </div>
-                                <h3 class="text-sm font-bold text-slate-100 group-hover:text-accentBlue transition-colors line-clamp-2 leading-snug">
+                            </div>
+
+                            <div class="p-5 space-y-3">
+                                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                                    <span class="font-bold text-accentBlue truncate max-w-[160px]">${m.team}</span>
+                                    <span class="text-slate-400">${m.seasonKey}</span>
+                                </div>
+
+                                <h3 class="text-sm font-bold text-white line-clamp-2 leading-snug hover:text-accentBlue transition-colors cursor-pointer modal-trigger" data-id="${m.id}">
                                     ${m.title}
                                 </h3>
+
+                                <div class="space-y-1 pt-1">
+                                    ${(m.specs || []).slice(0, 2).map(s => `
+                                        <div class="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                                            <i class="fa-solid fa-check text-[9px] text-accentBlue"></i>
+                                            <span>${s}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
-                            ${m.specs && m.specs.length > 0 ? `
-                            <div class="pt-2 border-t border-cardBorder/60 space-y-1">
-                                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">KEY COMPONENTS</span>
-                                <ul class="space-y-0.5 text-xs text-slate-300">
-                                    ${m.specs.slice(0, 2).map(s => `<li class="truncate flex items-center gap-1.5"><i class="fa-solid fa-check text-accentBlue text-[9px]"></i> ${s}</li>`).join('')}
-                                </ul>
-                            </div>` : ''}
-                            <div class="pt-2 flex items-center justify-between text-xs font-bold text-accentBlue group-hover:translate-x-1 transition-transform uppercase tracking-wider font-mono">
-                                <span>Inspect Design & Specs</span>
-                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </div>
+
+                        <div class="px-5 py-3.5 bg-pitch/50 border-t border-cardBorder/80 flex items-center justify-between gap-2 text-xs">
+                            <button data-id="${m.id}" class="modal-trigger text-accentBlue font-bold hover:underline flex items-center gap-1 text-[11px]">
+                                <span>Inspect Specs</span>
+                                <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                            </button>
+
+                            <div class="flex items-center gap-1.5">
+                                <button data-id="${m.id}" class="compare-toggle-btn p-1.5 rounded-lg ${isCompared ? 'bg-accentBlue text-white' : 'bg-cardBg border border-cardBorder text-slate-400 hover:text-white'} transition-colors" title="Compare">
+                                    <i class="fa-solid fa-code-compare text-xs"></i>
+                                </button>
+                                <button data-id="${m.id}" class="bookmark-toggle-btn p-1.5 rounded-lg ${isSaved ? 'bg-accentAmber/20 text-accentAmber border border-accentAmber/40' : 'bg-cardBg border border-cardBorder text-slate-400 hover:text-white'} transition-colors" title="Bookmark">
+                                    <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark text-xs"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            document.querySelectorAll('.mech-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('.card-bookmark-btn') || e.target.closest('.card-compare-btn')) return;
-                    const id = card.getAttribute('data-id');
-                    const m = mechanismsData.find(item => item.id === id);
-                    if (m) openDetailModal(m);
+            // Render 3D previews for CAD thumbnails
+            setTimeout(() => {
+                filtered.filter(m => m.hasCad).forEach(m => {
+                    const canvas = document.getElementById(`thumb-canvas-${m.id}`);
+                    if (canvas) renderCadThumbnailCanvas(canvas, getEffectiveCadType(m));
                 });
+            }, 50);
+
+            // Bind interactions
+            document.querySelectorAll('.modal-trigger').forEach(btn => {
+                btn.addEventListener('click', (e) => openDetailModal(e.currentTarget.getAttribute('data-id')));
             });
 
-            document.querySelectorAll('.card-bookmark-btn').forEach(btn => {
+            document.querySelectorAll('.bookmark-toggle-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = btn.getAttribute('data-id');
-                    toggleBookmark(id);
+                    const id = e.currentTarget.getAttribute('data-id');
+                    bookmarkedIds.has(id) ? bookmarkedIds.delete(id) : bookmarkedIds.add(id);
+                    updateBookmarksBadge();
+                    filterAndRenderGrid();
                 });
             });
 
-            document.querySelectorAll('.card-compare-btn').forEach(btn => {
+            document.querySelectorAll('.compare-toggle-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = btn.getAttribute('data-id');
-                    toggleCompare(id);
+                    const id = e.currentTarget.getAttribute('data-id');
+                    if (compareIds.has(id)) {
+                        compareIds.delete(id);
+                    } else {
+                        if (compareIds.size >= 2) compareIds.delete(compareIds.values().next().value);
+                        compareIds.add(id);
+                    }
+                    updateCompareBadge();
+                    filterAndRenderGrid();
                 });
             });
         }
 
-        function toggleBookmark(id) {
-            if (bookmarkedIds.has(id)) {
-                bookmarkedIds.delete(id);
-            } else {
-                bookmarkedIds.add(id);
-            }
-            updateBookmarkUI();
-            filterAndRenderGrid();
-            renderBookmarksDrawer();
-        }
-
-        function toggleCompare(id) {
-            if (compareIds.has(id)) {
-                compareIds.delete(id);
-            } else {
-                if (compareIds.size >= 2) {
-                    const first = compareIds.values().next().value;
-                    compareIds.delete(first);
-                }
-                compareIds.add(id);
-            }
-            updateCompareUI();
-            filterAndRenderGrid();
-        }
-
-        function updateBookmarkUI() {
-            const count = bookmarkedIds.size;
+        function updateBookmarksBadge() {
             const badge = document.getElementById('bookmarkCountBadge');
-            if (count > 0) {
-                badge.innerText = count;
+            if (bookmarkedIds.size > 0) {
+                badge.innerText = bookmarkedIds.size;
                 badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
             }
-
-            if (currentModalMech) {
-                const modalBtn = document.getElementById('modalBookmarkToggleBtn');
-                const isBookmarked = bookmarkedIds.has(currentModalMech.id);
-                modalBtn.innerHTML = `
-                    <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-accentAmber"></i>
-                    <span>${isBookmarked ? 'Saved in Bookmarks' : 'Save to Bookmarks'}</span>
-                `;
-            }
         }
 
-        function updateCompareUI() {
-            const count = compareIds.size;
+        function updateCompareBadge() {
             const badge = document.getElementById('compareCountBadge');
-            if (count > 0) {
-                badge.innerText = count;
+            if (compareIds.size > 0) {
+                badge.innerText = compareIds.size;
                 badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
             }
-        }
-
-        function renderBookmarksDrawer() {
-            const container = document.getElementById('bookmarksList');
-            if (bookmarkedIds.size === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-500 text-xs font-mono">
-                        <i class="fa-regular fa-bookmark text-2xl mb-2 text-slate-600"></i>
-                        <p>No saved mechanisms yet.</p>
-                        <p class="text-[10px] text-slate-600 mt-1">Click the bookmark icon on any card.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const bookmarkedMechs = mechanismsData.filter(m => bookmarkedIds.has(m.id));
-            container.innerHTML = bookmarkedMechs.map(m => `
-                <div class="p-3 bg-pitch border border-cardBorder rounded-xl flex items-center justify-between gap-3 group hover:border-accentBlue/50 transition-all">
-                    <div class="flex-1 min-w-0 cursor-pointer bookmark-item-click" data-id="${m.id}">
-                        <span class="text-[10px] font-mono text-accentBlue font-bold block truncate">${m.team}</span>
-                        <h4 class="text-xs font-bold text-slate-200 group-hover:text-accentBlue transition-colors truncate">${m.title}</h4>
-                        <span class="text-[10px] text-slate-500 font-mono">${m.seasonKey}</span>
-                    </div>
-                    <button class="bookmark-item-delete text-slate-500 hover:text-rose-400 p-1.5 transition-colors" data-id="${m.id}" title="Remove Bookmark">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                    </button>
-                </div>
-            `).join('');
-
-            container.querySelectorAll('.bookmark-item-click').forEach(el => {
-                el.addEventListener('click', () => {
-                    const id = el.getAttribute('data-id');
-                    const m = mechanismsData.find(item => item.id === id);
-                    if (m) openDetailModal(m);
-                });
-            });
-
-            container.querySelectorAll('.bookmark-item-delete').forEach(el => {
-                el.addEventListener('click', () => {
-                    const id = el.getAttribute('data-id');
-                    toggleBookmark(id);
-                });
-            });
-        }
-
-        function init3dViewport() {
-            const container = document.getElementById('threeJsViewport');
-            if (!container || scene3d) return;
-
-            scene3d = new THREE.Scene();
-            scene3d.background = new THREE.Color(0x020617);
-
-            camera3d = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera3d.position.set(20, 18, 25);
-
-            renderer3d = new THREE.WebGLRenderer({ antialias: true });
-            renderer3d.setSize(container.clientWidth, container.clientHeight);
-            renderer3d.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer3d.domElement);
-
-            controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
-            controls3d.enableDamping = true;
-            controls3d.dampingFactor = 0.05;
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene3d.add(ambientLight);
-
-            const dirLight = new THREE.DirectionalLight(0x2563EB, 1.2);
-            dirLight.position.set(20, 30, 20);
-            scene3d.add(dirLight);
-
-            const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
-            dirLight2.position.set(-20, -10, -20);
-            scene3d.add(dirLight2);
-
-            const gridHelper = new THREE.GridHelper(40, 20, 0x2563EB, 0x1e293b);
-            gridHelper.position.y = -5;
-            scene3d.add(gridHelper);
-
-            function animate3d() {
-                animReq3d = requestAnimationFrame(animate3d);
-                if (currentMesh3d) {
-                    currentMesh3d.rotation.y += 0.005;
-                }
-                controls3d.update();
-                renderer3d.render(scene3d, camera3d);
-            }
-            animate3d();
-
-            window.addEventListener('resize', () => {
-                if (!container || !renderer3d) return;
-                camera3d.aspect = container.clientWidth / container.clientHeight;
-                camera3d.updateProjectionMatrix();
-                renderer3d.setSize(container.clientWidth, container.clientHeight);
-            });
-        }
-
-        function load3dMechanismModel(type) {
-            init3dViewport();
-            if (currentMesh3d) {
-                scene3d.remove(currentMesh3d);
-            }
-
-            const group = new THREE.Group();
-            const materialOptions = { wireframe: isWireframe3d };
-
-            if (type === 'ELEVATOR') {
-                const alumMat = new THREE.MeshStandardMaterial({ color: 0x94A3B8, metalness: 0.8, roughness: 0.2, ...materialOptions });
-                const blueMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
-
-                const base = new THREE.Mesh(new THREE.BoxGeometry(2, 16, 1), alumMat);
-                base.position.set(-2, 3, 0);
-                group.add(base);
-
-                const stage2 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 14, 0.8), blueMat);
-                stage2.position.set(0, 7, 0);
-                group.add(stage2);
-
-                const carriage = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 3), new THREE.MeshStandardMaterial({ color: 0x1e293b, ...materialOptions }));
-                carriage.position.set(1, 12, 0);
-                group.add(carriage);
-
-            } else if (type === 'CATAPULT' || type === 'FLYWHEEL') {
-                const alumMat = new THREE.MeshStandardMaterial({ color: 0x94A3B8, metalness: 0.8, roughness: 0.2, ...materialOptions });
-                const blueMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
-                const chassisMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, ...materialOptions });
-                const springMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, metalness: 0.9, ...materialOptions });
-
-                // Catapult Base Frame
-                const frame = new THREE.Mesh(new THREE.BoxGeometry(10, 1, 8), chassisMat);
-                frame.position.set(0, -3, 0);
-                group.add(frame);
-
-                // Pivot Uprights
-                const upright1 = new THREE.Mesh(new THREE.BoxGeometry(1, 6, 1), alumMat);
-                upright1.position.set(-3, 0, -3);
-                const upright2 = new THREE.Mesh(new THREE.BoxGeometry(1, 6, 1), alumMat);
-                upright2.position.set(-3, 0, 3);
-                group.add(upright1);
-                group.add(upright2);
-
-                // Pivot Axle
-                const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 7, 16), alumMat);
-                axle.rotation.x = Math.PI / 2;
-                axle.position.set(-3, 2, 0);
-                group.add(axle);
-
-                // Launch Arm (angled upwards)
-                const armGroup = new THREE.Group();
-                armGroup.position.set(-3, 2, 0);
-                armGroup.rotation.z = Math.PI / 6;
-
-                const lever = new THREE.Mesh(new THREE.BoxGeometry(12, 0.8, 1.2), blueMat);
-                lever.position.set(5, 0, 0);
-                armGroup.add(lever);
-
-                // Bucket at top of arm
-                const bucket = new THREE.Mesh(new THREE.CylinderGeometry(2, 1.5, 2, 16, 1, true), blueMat);
-                bucket.position.set(11, 1, 0);
-                armGroup.add(bucket);
-
-                group.add(armGroup);
-
-                // Torsion/Tension Springs
-                const spring1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 2, 12), springMat);
-                spring1.rotation.x = Math.PI / 2;
-                spring1.position.set(-3, 2, -1.8);
-                const spring2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 2, 12), springMat);
-                spring2.rotation.x = Math.PI / 2;
-                spring2.position.set(-3, 2, 1.8);
-                group.add(spring1);
-                group.add(spring2);
-
-            } else if (type === 'SPINTAKE') {
-                const axleMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, metalness: 0.9, ...materialOptions });
-                const blueWheelMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
-
-                const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 16, 16), axleMat);
-                axle.rotation.z = Math.PI / 2;
-                group.add(axle);
-
-                for (let x = -6; x <= 6; x += 3) {
-                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.8, 20), blueWheelMat);
-                    wheel.rotation.z = Math.PI / 2;
-                    wheel.position.x = x;
-                    group.add(wheel);
-                }
-
-            } else {
-                const servoMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5, ...materialOptions });
-                const fingerMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
-
-                const body = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), servoMat);
-                group.add(body);
-
-                const finger1 = new THREE.Mesh(new THREE.BoxGeometry(1, 6, 1), fingerMat);
-                finger1.position.set(-2, 4, 2);
-                finger1.rotation.x = -0.3;
-
-                const finger2 = new THREE.Mesh(new THREE.BoxGeometry(1, 6, 1), fingerMat);
-                finger2.position.set(2, 4, 2);
-                finger2.rotation.x = -0.3;
-
-                group.add(finger1);
-                group.add(finger2);
-            }
-
-            currentMesh3d = group;
-            scene3d.add(currentMesh3d);
-        }
-
-        function openDetailModal(m) {
-            currentModalMech = m;
-            document.getElementById('modalTeamTag').innerText = m.team;
-            
-            const sObj = seasonsList.find(s => s.key === m.seasonKey);
-            const seasonIcon = sObj ? sObj.icon : (m.seasonIcon || 'fa-solid fa-layer-group');
-            document.getElementById('modalSeasonTag').innerHTML = `<i class="${seasonIcon}"></i> ${m.season}`;
-            
-            document.getElementById('modalCategoryTag').innerText = m.category;
-            document.getElementById('modalTitle').innerText = m.title;
-
-            const mediaContainer = document.getElementById('modalMediaContainer');
-            const canvas3dContainer = document.getElementById('modal3dCanvasContainer');
-            const tabMediaBtn = document.getElementById('tabMediaBtn');
-            const tabCadBtn = document.getElementById('tabCadBtn');
-
-            mediaContainer.classList.remove('hidden');
-            canvas3dContainer.classList.add('hidden');
-            tabMediaBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
-            tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
-
-            if (m.youtubeId) {
-                mediaContainer.innerHTML = `
-                    <iframe src="https://www.youtube.com/embed/${m.youtubeId}?autoplay=1&mute=0" 
-                            title="${m.title}" class="w-full h-full" frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                `;
-            } else if (m.mediaUrl && m.mediaUrl.includes('instagram')) {
-                mediaContainer.innerHTML = `
-                    <div class="w-full h-full flex flex-col items-center justify-center p-6 bg-pitch text-center space-y-3">
-                        <i class="fa-brands fa-instagram text-5xl text-pink-500 animate-pulse"></i>
-                        <h4 class="text-sm font-bold text-slate-200">Instagram Reel / Clip Showcase</h4>
-                        <p class="text-xs text-slate-400 max-w-sm">This mechanism was shared on Instagram reels. Click below to view full video post.</p>
-                        <a href="${m.mediaUrl}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-pink-600 text-white font-bold text-xs flex items-center gap-2">
-                            <i class="fa-brands fa-instagram"></i> Open Reel on Instagram
-                        </a>
-                    </div>
-                `;
-            } else {
-                mediaContainer.innerHTML = `
-                    <div class="w-full h-full flex flex-col items-center justify-center p-6 bg-pitch text-center space-y-3">
-                        <i class="fa-solid fa-cube text-5xl text-accentBlue animate-pulse"></i>
-                        <h4 class="text-sm font-bold text-slate-200">Interactive 3D WebGL CAD Model Available</h4>
-                        <p class="text-xs text-slate-400 max-w-sm">Switch to the "Interactive 3D WebGL CAD" tab above to orbit and inspect this assembly.</p>
-                    </div>
-                `;
-            }
-
-            const specsList = document.getElementById('modalHardwareSpecs');
-            if (m.specs && m.specs.length > 0) {
-                specsList.innerHTML = m.specs.map(s => `<li>${s}</li>`).join('');
-            } else {
-                specsList.innerHTML = `<li class="text-slate-500 italic">No hardware BOM provided.</li>`;
-            }
-
-            document.getElementById('modalSoftwareNotes').innerText = m.software || 'Standard FTC control algorithm.';
-
-            const cadContainer = document.getElementById('modalCadContainer');
-            if (m.hasCad) {
-                cadContainer.classList.remove('hidden');
-                document.getElementById('modalCadLink').href = m.cadUrl || '#';
-            } else {
-                cadContainer.classList.add('hidden');
-            }
-
-            document.getElementById('modalDirectMediaLink').href = m.mediaUrl || '#';
-
-            updateBookmarkUI();
-
-            const modal = document.getElementById('detailModal');
-            modal.classList.remove('hidden');
-
-            load3dMechanismModel(m.cad3dType || 'ELEVATOR');
         }
 
         function openCompareModal() {
-            const modal = document.getElementById('compareModal');
-            const container = document.getElementById('compareContent');
+            const compareModal = document.getElementById('compareModal');
+            const compareContent = document.getElementById('compareContent');
+            const selectedMechs = mechanismsData.filter(m => compareIds.has(m.id));
 
-            if (compareIds.size === 0) {
-                container.innerHTML = `
-                    <div class="col-span-2 text-center py-12 text-slate-500 font-mono">
-                        <i class="fa-solid fa-code-compare text-3xl mb-3 text-slate-600"></i>
-                        <p>No mechanisms selected for comparison.</p>
-                        <p class="text-[11px] text-slate-600 mt-1">Click the compare icon on any 2 mechanism cards to compare specs.</p>
+            if (selectedMechs.length < 2) {
+                compareContent.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-code-compare text-3xl text-accentBlue mb-3"></i>
+                        <h4 class="text-sm font-bold text-white mb-1">Select two mechanisms to compare</h4>
+                        <p class="text-xs">Use the compare icon on two mechanism cards, then open Compare again.</p>
                     </div>
                 `;
             } else {
-                const selectedMechs = mechanismsData.filter(m => compareIds.has(m.id));
-                container.innerHTML = selectedMechs.map(m => `
-                    <div class="bg-pitch border border-cardBorder rounded-xl p-5 space-y-4">
-                        <div class="border-b border-cardBorder pb-3">
-                            <span class="text-xs font-mono font-bold text-accentBlue">${m.team}</span>
-                            <h3 class="text-base font-bold text-slate-100">${m.title}</h3>
-                            <span class="text-[11px] font-mono text-accentAmber">${m.season}</span>
+                compareContent.innerHTML = selectedMechs.map(m => `
+                    <article class="p-5 rounded-xl bg-pitch border border-cardBorder space-y-4">
+                        <div>
+                            <div class="text-[10px] font-mono font-bold text-accentBlue uppercase">${m.team}</div>
+                            <h4 class="text-base font-bold text-white mt-1">${m.title}</h4>
+                            <div class="text-[10px] text-slate-400 mt-1">${m.season} · ${m.category}</div>
                         </div>
                         <div>
-                            <h4 class="font-mono text-slate-400 font-bold uppercase mb-1">Category</h4>
-                            <p class="text-slate-200 font-semibold">${m.category}</p>
-                        </div>
-                        <div>
-                            <h4 class="font-mono text-slate-400 font-bold uppercase mb-1">Hardware BOM</h4>
-                            <ul class="list-disc list-inside space-y-1 text-slate-300">
-                                ${m.specs ? m.specs.map(s => `<li>${s}</li>`).join('') : '<li>N/A</li>'}
+                            <div class="text-[10px] font-mono font-bold uppercase text-accentAmber mb-2">Hardware BOM</div>
+                            <ul class="space-y-1 text-xs text-slate-300 list-disc list-inside">
+                                ${(m.specs || []).map(spec => `<li>${spec}</li>`).join('') || '<li>No hardware details provided.</li>'}
                             </ul>
                         </div>
                         <div>
-                            <h4 class="font-mono text-slate-400 font-bold uppercase mb-1">Software Logic</h4>
-                            <p class="text-slate-300 font-mono bg-cardBg p-2.5 rounded border border-cardBorder">${m.software || 'N/A'}</p>
+                            <div class="text-[10px] font-mono font-bold uppercase text-accentBlue mb-2">Software Logic</div>
+                            <p class="text-xs text-slate-300 leading-relaxed">${m.software || 'No software notes provided.'}</p>
                         </div>
-                    </div>
+                    </article>
                 `).join('');
             }
 
-            modal.classList.remove('hidden');
+            compareModal.classList.remove('hidden');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initFirebase();
             renderSeasonTimeline();
 
-            document.getElementById('navLogoBtn').addEventListener('click', () => switchView('home'));
             document.getElementById('navHomeBtn').addEventListener('click', () => switchView('home'));
+            document.getElementById('navLogoBtn').addEventListener('click', () => switchView('home'));
             document.getElementById('navVaultBtn').addEventListener('click', () => switchView('vault'));
             document.getElementById('homeExploreVaultBtn').addEventListener('click', () => switchView('vault'));
             document.getElementById('ctaLaunchVaultBtn').addEventListener('click', () => switchView('vault'));
 
-            const vaultSearchInput = document.getElementById('vaultSearchInput');
+            const searchInput = document.getElementById('vaultSearchInput');
             const clearSearchBtn = document.getElementById('clearSearchBtn');
 
-            vaultSearchInput.addEventListener('input', (e) => {
+            searchInput.addEventListener('input', (e) => {
                 searchQuery = e.target.value;
-                if (clearSearchBtn) {
-                    if (searchQuery.length > 0) {
-                        clearSearchBtn.classList.remove('hidden');
-                    } else {
-                        clearSearchBtn.classList.add('hidden');
-                    }
-                }
-                if (currentView !== 'vault') {
-                    switchView('vault');
-                } else {
-                    filterAndRenderGrid();
-                }
+                searchQuery ? clearSearchBtn.classList.remove('hidden') : clearSearchBtn.classList.add('hidden');
+                filterAndRenderGrid();
             });
 
-            if (clearSearchBtn) {
-                clearSearchBtn.addEventListener('click', () => {
-                    vaultSearchInput.value = '';
-                    searchQuery = '';
-                    clearSearchBtn.classList.add('hidden');
-                    filterAndRenderGrid();
-                });
-            }
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.classList.add('hidden');
+                filterAndRenderGrid();
+            });
 
-            document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(p => {
-                        p.className = 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500 flex items-center gap-1.5';
-                    });
-                    const cat = e.currentTarget.getAttribute('data-category');
-                    activeCategory = cat;
-                    e.currentTarget.className = 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm flex items-center gap-1.5';
+            document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(pill => {
+                pill.addEventListener('click', (e) => {
+                    activeCategory = e.currentTarget.getAttribute('data-category');
+                    document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(p => p.className = "cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500");
+                    e.currentTarget.className = "cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm";
                     filterAndRenderGrid();
                 });
             });
@@ -1644,74 +1699,102 @@
                 activeCategory = 'ALL';
                 searchQuery = '';
                 showCadOnly = false;
-                vaultSearchInput.value = '';
-                if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+                searchInput.value = '';
                 document.getElementById('cadOnlyToggle').checked = false;
-                document.getElementById('activeSeasonBadge').innerText = 'Active: All Seasons';
                 renderSeasonTimeline();
-                document.querySelectorAll('#categoryPillGroup .cat-pill').forEach((p, idx) => {
-                    p.className = idx === 0 
-                        ? 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm flex items-center gap-1.5'
-                        : 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500 flex items-center gap-1.5';
-                });
                 filterAndRenderGrid();
             });
 
-            const tabMediaBtn = document.getElementById('tabMediaBtn');
-            const tabCadBtn = document.getElementById('tabCadBtn');
-            const mediaContainer = document.getElementById('modalMediaContainer');
-            const canvas3dContainer = document.getElementById('modal3dCanvasContainer');
-
-            tabMediaBtn.addEventListener('click', () => {
-                mediaContainer.classList.remove('hidden');
-                canvas3dContainer.classList.add('hidden');
-                tabMediaBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
-                tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
-            });
-
-            tabCadBtn.addEventListener('click', () => {
-                mediaContainer.classList.add('hidden');
-                canvas3dContainer.classList.remove('hidden');
-                tabCadBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
-                tabMediaBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
-                if (controls3d) controls3d.update();
-            });
-
-            document.getElementById('reset3dCameraBtn').addEventListener('click', () => {
-                if (camera3d && controls3d) {
-                    camera3d.position.set(20, 18, 25);
-                    controls3d.reset();
-                }
-            });
-
-            document.getElementById('toggle3dWireframeBtn').addEventListener('click', () => {
-                isWireframe3d = !isWireframe3d;
-                if (currentModalMech) {
-                    load3dMechanismModel(currentModalMech.cad3dType || 'ELEVATOR');
+            // Global Delete Listener
+            document.getElementById('deleteMechanismBtn').addEventListener('click', async () => {
+                if (!currentModalMech) return;
+                if (confirm(`Are you sure you want to globally delete "${currentModalMech.title}"?`)) {
+                    if (isFirebaseConnected) {
+                        try {
+                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mechanisms', currentModalMech.id));
+                        } catch(e) {
+                            console.error("Error deleting document: ", e);
+                        }
+                    }
+                    mechanismsData = mechanismsData.filter(m => m.id !== currentModalMech.id);
+                    localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
+                    
+                    document.getElementById('detailModal').classList.add('hidden');
+                    if (animReq3d) cancelAnimationFrame(animReq3d);
+                    
+                    filterAndRenderGrid();
                 }
             });
 
             document.getElementById('closeDetailModalBtn').addEventListener('click', () => {
                 document.getElementById('detailModal').classList.add('hidden');
+                if (animReq3d) cancelAnimationFrame(animReq3d);
+                document.getElementById('modal3dCanvasContainer').innerHTML = '';
                 document.getElementById('modalMediaContainer').innerHTML = '';
             });
 
-            document.getElementById('modalBookmarkToggleBtn').addEventListener('click', () => {
-                if (currentModalMech) {
-                    toggleBookmark(currentModalMech.id);
+            document.getElementById('tabMediaBtn').addEventListener('click', () => {
+                document.getElementById('modal3dCanvasContainer').classList.add('hidden');
+                document.getElementById('modalMediaContainer').classList.remove('hidden');
+
+                document.getElementById('tabMediaBtn').className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                const tabCadBtn = document.getElementById('tabCadBtn');
+                if (tabCadBtn) tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+            });
+
+            document.getElementById('tabCadBtn').addEventListener('click', () => {
+                document.getElementById('modalMediaContainer').classList.add('hidden');
+                document.getElementById('modal3dCanvasContainer').classList.remove('hidden');
+                
+                document.getElementById('tabCadBtn').className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                const tabMediaBtn = document.getElementById('tabMediaBtn');
+                if (tabMediaBtn) tabMediaBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+
+                const container = document.getElementById('modal3dCanvasContainer');
+                
+                // If a valid CAD URL is available, embed it natively using an iframe
+                if (currentModalMech && currentModalMech.hasCad && currentModalMech.cadUrl && currentModalMech.cadUrl.includes('http')) {
+                    let embedUrl = currentModalMech.cadUrl;
+                    const cadFileType = getCadFileType(embedUrl);
+                    if (cadFileType) {
+                        container.innerHTML = '';
+                        loadCadFile(container, embedUrl, cadFileType);
+                    } else if (embedUrl.includes('onshape.com') && !embedUrl.includes('iframewindow=true')) {
+                        embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'iframewindow=true';
+                        container.innerHTML = '';
+                        const iframe = document.createElement('iframe');
+                        iframe.src = embedUrl;
+                        iframe.className = 'w-full h-full border-0 rounded-xl';
+                        container.appendChild(iframe);
+                        if (animReq3d) cancelAnimationFrame(animReq3d);
+                    } else {
+                        container.innerHTML = '';
+                        loadCadFile(container, embedUrl, cadFileType);
+                    }
+                } else {
+                    // Revert to 3D Viewport Structure if no direct URL to embed
+                    container.innerHTML = `
+                        <div id="threeJsViewport" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+                        <div class="absolute bottom-3 left-3 bg-pitch/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-cardBorder text-[11px] font-mono flex items-center gap-3">
+                            <span class="text-slate-400"><i class="fa-solid fa-hand-pointer text-accentBlue"></i> Orbit: Drag | Zoom: Scroll</span>
+                            <button id="reset3dCameraBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                            <button id="toggle3dWireframeBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-border-all"></i> Wireframe</button>
+                        </div>
+                    `;
+                    document.getElementById('reset3dCameraBtn').addEventListener('click', () => {
+                        if (camera3d && controls3d) { camera3d.position.set(4, 3, 5); controls3d.reset(); }
+                    });
+                    document.getElementById('toggle3dWireframeBtn').addEventListener('click', () => {
+                        isWireframe3d = !isWireframe3d;
+                        if (currentModalMech) init3dViewer('threeJsViewport', getEffectiveCadType(currentModalMech));
+                    });
+
+                    setTimeout(() => init3dViewer('threeJsViewport', getEffectiveCadType(currentModalMech)), 50);
                 }
             });
 
-            document.getElementById('modalCopyLinkBtn').addEventListener('click', () => {
-                if (currentModalMech) {
-                    const url = currentModalMech.mediaUrl || window.location.href;
-                    navigator.clipboard.writeText(url).then(() => {
-                        const btn = document.getElementById('modalCopyLinkBtn');
-                        const originalHtml = btn.innerHTML;
-                        btn.innerHTML = `<i class="fa-solid fa-check text-accentEmerald"></i> Link Copied!`;
-                        setTimeout(() => btn.innerHTML = originalHtml, 2000);
-                    });
-                }
+            document.getElementById('openSubmitModalBtn').addEventListener('click', () => {
+                document.getElementById('submitModal').classList.remove('hidden');
             });
 
             document.getElementById('openCompareModalBtn').addEventListener('click', openCompareModal);
@@ -1719,69 +1802,37 @@
                 document.getElementById('compareModal').classList.add('hidden');
             });
 
-            const submitModal = document.getElementById('submitModal');
-            document.getElementById('openSubmitModalBtn').addEventListener('click', () => submitModal.classList.remove('hidden'));
-            document.getElementById('closeSubmitModalBtn').addEventListener('click', () => submitModal.classList.add('hidden'));
-
-            const bookmarksDrawer = document.getElementById('bookmarksDrawer');
-            document.getElementById('openBookmarksDrawerBtn').addEventListener('click', () => {
-                renderBookmarksDrawer();
-                bookmarksDrawer.classList.remove('translate-x-full');
-            });
-            document.getElementById('closeBookmarksDrawerBtn').addEventListener('click', () => {
-                bookmarksDrawer.classList.add('translate-x-full');
+            document.getElementById('closeSubmitModalBtn').addEventListener('click', () => {
+                document.getElementById('submitModal').classList.add('hidden');
             });
 
             document.getElementById('submissionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const team = document.getElementById('subTeam').value;
-                const season = document.getElementById('subSeason').value;
-                const title = document.getElementById('subTitle').value;
-                const category = document.getElementById('subCategory').value;
-                const cad3dType = document.getElementById('subCad3dType').value;
-                const videoUrl = document.getElementById('subVideoUrl').value;
-                const cadUrl = document.getElementById('subCadUrl').value;
-                const hardware = document.getElementById('subHardware').value;
-                const software = document.getElementById('subSoftware').value;
-
-                let youtubeId = '';
-                if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                    const match = videoUrl.match(regExp);
-                    if (match && match[2].length === 11) {
-                        youtubeId = match[2];
-                    }
-                }
-
-                const seasonKeyMatch = season.match(/\((.*?)\)/);
-                const seasonKey = seasonKeyMatch ? seasonKeyMatch[1] : '2026-2027';
 
                 const newMech = {
-                    id: 'mech-sub-' + Date.now(),
-                    team,
-                    title,
-                    season,
-                    seasonKey,
-                    category,
-                    mediaType: youtubeId ? 'YouTube' : (videoUrl.includes('instagram') ? 'Instagram' : 'Link'),
-                    youtubeId,
-                    mediaUrl: videoUrl,
-                    hasCad: Boolean(cadUrl),
-                    cadUrl,
-                    cad3dType,
-                    specs: hardware ? hardware.split(',').map(s => s.trim()) : [],
-                    software: software || 'Community submission notes.'
+                    id: 'mech-user-' + Date.now(),
+                    team: document.getElementById('subTeam').value,
+                    season: document.getElementById('subSeason').value,
+                    seasonKey: document.getElementById('subSeason').value.match(/\(([^)]+)\)/)?.[1] || '2026-2027',
+                    title: document.getElementById('subTitle').value,
+                    category: document.getElementById('subCategory').value,
+                    cad3dType: document.getElementById('subCad3dType').value,
+                    mediaUrl: document.getElementById('subVideoUrl').value.trim(),
+                    hasCad: !!document.getElementById('subCadUrl').value.trim() || document.getElementById('subCad3dType').value !== 'NONE',
+                    cadUrl: document.getElementById('subCadUrl').value || '',
+                    specs: document.getElementById('subHardware').value.split(',').map(s => s.trim()).filter(Boolean),
+                    software: document.getElementById('subSoftware').value || 'Standard TeleOp / Autonomous driving control.'
                 };
 
-                if (isFirebaseConnected && db) {
+                const ytMatch = newMech.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                newMech.youtubeId = ytMatch ? ytMatch[1] : '';
+
+                if (isFirebaseConnected) {
                     try {
                         const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'mechanisms');
                         await setDoc(doc(colRef, newMech.id), newMech);
                     } catch (err) {
-                        console.error("Error pushing to cloud:", err);
-                        mechanismsData.unshift(newMech);
-                        localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
-                        filterAndRenderGrid();
+                        console.error("Error submitting to Firebase:", err);
                     }
                 } else {
                     mechanismsData.unshift(newMech);
@@ -1789,9 +1840,50 @@
                     filterAndRenderGrid();
                 }
 
-                submitModal.classList.add('hidden');
                 document.getElementById('submissionForm').reset();
+                document.getElementById('submitModal').classList.add('hidden');
             });
+
+            document.getElementById('openBookmarksDrawerBtn').addEventListener('click', () => {
+                const drawer = document.getElementById('bookmarksDrawer');
+                const list = document.getElementById('bookmarksList');
+                const savedMechs = mechanismsData.filter(m => bookmarkedIds.has(m.id));
+
+                if (savedMechs.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center py-12 text-slate-400 text-xs">
+                            <i class="fa-solid fa-bookmark text-2xl mb-2 text-slate-600 block"></i>
+                            No saved mechanisms yet. Click the bookmark icon on any card to save it here.
+                        </div>
+                    `;
+                } else {
+                    list.innerHTML = savedMechs.map(m => `
+                        <div class="p-3 bg-pitch rounded-xl border border-cardBorder flex items-center justify-between gap-3 text-xs">
+                            <div>
+                                <div class="font-mono text-[10px] text-accentBlue font-bold">${m.team}</div>
+                                <div class="font-bold text-white truncate max-w-[200px]">${m.title}</div>
+                            </div>
+                            <button data-id="${m.id}" class="modal-trigger text-slate-400 hover:text-white p-1">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    `).join('');
+
+                    list.querySelectorAll('.modal-trigger').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            openDetailModal(e.currentTarget.getAttribute('data-id'));
+                            drawer.classList.add('translate-x-full');
+                        });
+                    });
+                }
+                drawer.classList.remove('translate-x-full');
+            });
+
+            document.getElementById('closeBookmarksDrawerBtn').addEventListener('click', () => {
+                document.getElementById('bookmarksDrawer').classList.add('translate-x-full');
+            });
+
+            initFirebase();
         });
     </script>
 </body>
