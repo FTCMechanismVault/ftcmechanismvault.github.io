@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTC Mechanism Vault & Historical Archive | CAD & Video Repository</title>
+
+    <link rel="icon" type="image/png" href="https://placehold.co/32x32/2563EB/FFFFFF?text=FTC">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pitch: '#020617',
+                        obsidian: '#070d19',
+                        cyberSlate: '#0f172a',
+                        cardBg: '#0f172a',
+                        cardBorder: '#1e293b',
+                        accentBlue: '#2563EB',
+                        accentBlueHover: '#1D4ED8',
+                        accentCyan: '#06B6D4',
+                        accentDarkBlue: '#1E3A8A',
+                        accentAmber: '#F59E0B',
+                        accentEmerald: '#10B981',
+                        accentIndigo: '#6366F1'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts, FontAwesome & Three.js for 3D CAD Rendering -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: #020617 !important;
+            color: #F8FAFC;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        .bg-blue-ambient {
+            background-color: #020617;
+            background-image: radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.08) 0%, rgba(2, 6, 23, 1) 60%),
+                        radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.05) 0%, rgba(2, 6, 23, 1) 70%);
+        }
+        .glow-blue {
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.35);
+        }
+        .glow-blue-sm {
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.25);
+        }
+        .text-glow-blue {
+            text-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563EB;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .fan-card-1 {
+            transform: rotate(-8deg) translateY(12px) translateX(-20px);
+        }
+        .fan-card-2 {
+            transform: rotate(0deg) translateY(-8px);
+            z-index: 10;
+        }
+        .fan-card-3 {
+            transform: rotate(8deg) translateY(18px) translateX(20px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-pitch text-slate-100 antialiased selection:bg-accentBlue selection:text-white">
+
+    <header class="sticky top-0 z-40 bg-pitch/95 backdrop-blur-md border-b border-cardBorder">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Brand Logo -->
+            <button id="navLogoBtn" class="flex items-center gap-3 text-left focus:outline-none group shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-accentDarkBlue via-accentBlue to-cyan-400 flex items-center justify-center text-white font-black shadow-lg glow-blue-sm group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-cubes text-lg"></i>
+                </div>
+                <div class="flex items-center text-xl sm:text-2xl font-black tracking-tight">
+                    <span class="text-white">FTC Mechanism</span>
+                    <span class="text-accentBlue text-glow-blue ml-1.5">Vault</span>
+                </div>
+            </button>
+
+            <!-- Header Navigation Links & Action Buttons -->
+            <div class="flex items-center gap-2 sm:gap-4 font-semibold text-xs sm:text-sm ml-auto">
+                
+                <nav class="flex items-center gap-1 sm:gap-2 mr-2">
+                    <button id="navHomeBtn" class="px-3 py-2 rounded-lg text-white hover:text-accentBlue transition-colors font-bold flex items-center gap-1.5 border-b-2 border-accentBlue">
+                        <span>Home</span>
+                    </button>
+                    <button id="navVaultBtn" class="px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold flex items-center gap-1.5 border-b-2 border-transparent">
+                        <span>Vault Archive</span>
+                    </button>
+                    <button id="openCompareModalBtn" class="px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold hidden sm:flex items-center gap-1.5">
+                        <span>Compare</span>
+                        <span id="compareCountBadge" class="px-1.5 py-0.2 bg-accentBlue text-white text-[10px] font-extrabold rounded-full hidden">0</span>
+                    </button>
+                </nav>
+
+                <!-- Bookmarks Drawer Button -->
+                <button id="openBookmarksDrawerBtn" class="p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl bg-cardBg border border-cardBorder hover:border-accentAmber/60 text-slate-300 hover:text-white transition-all flex items-center gap-2" title="Bookmarks">
+                    <i class="fa-solid fa-bookmark text-accentAmber text-sm"></i>
+                    <span class="hidden lg:inline text-xs font-bold">Saved</span>
+                    <span id="bookmarkCountBadge" class="px-1.5 py-0.2 bg-accentBlue text-white text-[10px] font-extrabold rounded-full hidden">0</span>
+                </button>
+
+                <!-- Submit Mechanism Action Button -->
+                <button id="openSubmitModalBtn" class="px-4 py-2.5 rounded-xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg glow-blue-sm transition-all transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Submit Mechanism</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="appContainer" class="flex-1 flex flex-col">
+
+        <!-- HOME PAGE VIEW -->
+        <section id="homeView" class="flex-1 flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-16">
+            
+            <!-- Hero Brand Section -->
+            <div class="space-y-6 pt-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-accentDarkBlue via-accentBlue to-cyan-400 flex items-center justify-center text-white text-2xl font-black shadow-xl glow-blue">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight flex items-center gap-1">
+                        <span>Mechanism</span><span class="text-accentBlue text-glow-blue">Vault</span>
+                    </h1>
+                </div>
+
+                <!-- Comprehensive Multi-Media Hero Statement -->
+                <div class="max-w-3xl space-y-4">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        A Comprehensive Multi-Media Library for <span class="text-accentBlue">FTC Mechanism Ideas</span>
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
+                        MechanismVault isn't just for CAD models—it is a complete, multi-platform media repository built for FIRST Tech Challenge (FTC) robotics teams. Discover, analyze, and save high-performing subsystem ideas gathered across <strong>3D CAD designs, YouTube reveals, Instagram clips, CAD animations, and community showcases</strong>.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                        <button id="homeExploreVaultBtn" class="px-5 py-3 rounded-xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-xs sm:text-sm shadow-lg glow-blue-sm transition-all flex items-center gap-2">
+                            <span>Explore the Mechanism Library</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multi-Platform Media Showcase Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pt-6 border-t border-cardBorder/60">
+                
+                <div class="lg:col-span-6 space-y-4">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Gather Inspiration from <span class="text-accentBlue">Every Format</span>
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Whether you need interactive 3D WebGL assemblies to inspect clearances, YouTube video breakdowns of high-speed spintakes, or Instagram reveal reels of differential wrists and linear elevators, MechanismVault consolidates top FTC engineering solutions in one place.
+                    </p>
+                    
+                    <!-- Multi-Media Badges -->
+                    <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
+                            <i class="fa-solid fa-cube text-accentBlue text-base"></i>
+                            <div>
+                                <div class="font-bold text-white">3D CAD Models</div>
+                                <div class="text-[10px] text-slate-400">Interactive WebGL & Onshape</div>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
+                            <i class="fa-brands fa-youtube text-rose-500 text-base"></i>
+                            <div>
+                                <div class="font-bold text-white">YouTube Demos</div>
+                                <div class="text-[10px] text-slate-400">Match breakdowns & reveals</div>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
+                            <i class="fa-brands fa-instagram text-pink-500 text-base"></i>
+                            <div>
+                                <div class="font-bold text-white">Instagram Clips</div>
+                                <div class="text-[10px] text-slate-400">Short mechanism reels</div>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
+                            <i class="fa-solid fa-screwdriver-wrench text-accentAmber text-base"></i>
+                            <div>
+                                <div class="font-bold text-white">BOM & PID Logic</div>
+                                <div class="text-[10px] text-slate-400">Hardware & control specs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Media Stacked Graphic -->
+                <div class="lg:col-span-6 relative flex justify-center items-center py-8">
+                    <div class="relative w-full max-w-md h-72 flex justify-center items-center">
+                        
+                        <!-- Card 1 (Instagram / Short Clip style) -->
+                        <div class="fan-card-1 absolute w-60 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-2xl space-y-2 pointer-events-none">
+                            <div class="h-28 rounded-lg bg-black/60 flex items-center justify-center border border-cardBorder relative overflow-hidden">
+                                <i class="fa-brands fa-instagram text-3xl text-pink-500"></i>
+                                <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-pink-600 text-white">INSTAGRAM REEL</span>
+                            </div>
+                            <span class="text-[10px] font-mono text-accentBlue font-bold uppercase">Spintake Concept</span>
+                            <h4 class="text-xs font-bold text-white truncate">Floating Roller Intake</h4>
+                        </div>
+
+                        <!-- Card 2 (Center prominent - 3D & Video) -->
+                        <div class="fan-card-2 absolute w-64 p-4 bg-obsidian border-2 border-accentBlue/80 rounded-2xl shadow-2xl space-y-2 z-20 glow-blue-sm">
+                            <div class="h-32 rounded-xl bg-pitch flex items-center justify-center border border-cardBorder relative overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80" alt="3D CAD and Video Media" class="w-full h-full object-cover opacity-80">
+                                <span class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-accentBlue text-white flex items-center gap-1">
+                                    <i class="fa-solid fa-layer-group"></i> 3D CAD + VIDEO
+                                </span>
+                            </div>
+                            <span class="text-[10px] font-mono text-accentBlue font-bold uppercase">Launcher Subsystem</span>
+                            <h4 class="text-xs font-bold text-white truncate">Dual Flywheel Launcher</h4>
+                        </div>
+
+                        <!-- Card 3 (YouTube style) -->
+                        <div class="fan-card-3 absolute w-60 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-2xl space-y-2 pointer-events-none">
+                            <div class="h-28 rounded-lg bg-black/60 flex items-center justify-center border border-cardBorder relative overflow-hidden">
+                                <i class="fa-brands fa-youtube text-3xl text-rose-500"></i>
+                                <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-rose-600 text-white">YOUTUBE REVEAL</span>
+                            </div>
+                            <span class="text-[10px] font-mono text-accentBlue font-bold uppercase">Linear Elevator</span>
+                            <h4 class="text-xs font-bold text-white truncate">Viper Slide High Lift</h4>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-cardBorder/60">
+                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
+                        <i class="fa-solid fa-icons"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Multi-Media Archive</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Browse mechanisms via YouTube, Instagram, 3D CAD, and documentation links.</p>
+                </div>
+
+                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
+                        <i class="fa-solid fa-cube"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Interactive 3D WebGL</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Orbit, inspect, zoom, and test wireframe assemblies directly in your browser.</p>
+                </div>
+
+                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
+                        <i class="fa-solid fa-code-compare"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Side-by-Side Compare</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Compare hardware BOMs and control algorithms between two mechanisms.</p>
+                </div>
+
+                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Community Submissions</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Submit custom team mechanisms with YouTube, Instagram, or CAD links.</p>
+                </div>
+            </div>
+
+            <!-- Call to Action Banner -->
+            <div class="p-8 rounded-3xl bg-gradient-to-r from-accentDarkBlue/40 via-cardBg to-obsidian border border-accentBlue/30 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">Ready to inspect robot mechanisms?</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Browse active spintakes, linear slides, differential wrists, and flywheel launchers across 8 FTC seasons.</p>
+                </div>
+                <button id="ctaLaunchVaultBtn" class="px-6 py-3.5 rounded-2xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-sm shadow-xl glow-blue shrink-0 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-base"></i>
+                    <span>Open Mechanism Vault</span>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- MAIN VAULT / ARCHIVE PAGE VIEW -->
+        <main id="vaultView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+            <!-- Historical Season Archive Banner & Live Counters Row -->
+            <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-obsidian via-cardBg to-cyberSlate border border-cardBorder shadow-2xl space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cardBorder/80 pb-5">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-accentBlue/20 text-accentBlue border border-accentBlue/40 flex items-center gap-1.5">
+                                <i class="fa-solid fa-box-archive"></i> FTC HISTORICAL ARCHIVE
+                            </span>
+                            <span id="archiveBannerSeasonBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold uppercase bg-accentAmber/20 text-accentAmber border border-accentAmber/40">
+                                ALL SEASONS
+                            </span>
+                        </div>
+                        <h2 id="archiveBannerTitle" class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                            FTC Mechanism Vault & Historical Archive
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+                            Explore, filter, and inspect CAD models, video reveals, and subsystem engineering specs across 8 historical FTC game seasons.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stats Counters Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-xl shrink-0">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <div>
+                            <div id="statTotalMechs" class="text-xl sm:text-2xl font-black text-white font-mono">0</div>
+                            <div class="text-[11px] font-bold text-slate-400">Total Mechanisms</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl shrink-0">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <div>
+                            <div id="statCadModels" class="text-xl sm:text-2xl font-black text-white font-mono">0</div>
+                            <div class="text-[11px] font-bold text-slate-400">3D CAD Assemblies</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-xl shrink-0">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <div>
+                            <div id="statVideoReveals" class="text-xl sm:text-2xl font-black text-white font-mono">0</div>
+                            <div class="text-[11px] font-bold text-slate-400">Video Reveals & Clips</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-accentAmber/10 border border-accentAmber/30 flex items-center justify-center text-accentAmber text-xl shrink-0">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div>
+                            <div id="statSeasons" class="text-xl sm:text-2xl font-black text-white font-mono">8 Seasons</div>
+                            <div class="text-[11px] font-bold text-slate-400">FTC Game Archives</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prominent Search Bar for Vault Archive -->
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none text-slate-400 text-base sm:text-lg">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <input type="text" id="vaultSearchInput" placeholder="Search by team # (e.g. #11115), mechanism name, hardware BOM, or season..." 
+                       class="w-full pl-12 sm:pl-14 pr-12 py-3.5 sm:py-4 bg-cyberSlate border-2 border-cardBorder focus:border-accentBlue focus:ring-4 focus:ring-accentBlue/20 focus:outline-none rounded-2xl text-sm sm:text-base text-slate-100 placeholder:text-slate-500 shadow-xl transition-all">
+                <button id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-300 hidden transition-colors" title="Clear Search">
+                    <i class="fa-solid fa-circle-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Season Selector Bar with Thematic Game Symbols -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-filter text-accentBlue"></i> Filter Game Season
+                    </h2>
+                    <span id="activeSeasonBadge" class="text-xs text-accentBlue font-mono font-semibold">Active: All Seasons</span>
+                </div>
+                
+                <div class="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x" id="seasonTimelineContainer">
+                    <!-- Dynamic season buttons with icons generated via JS -->
+                </div>
+            </div>
+
+            <!-- Subsystem Category Pills & Options Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+                <div class="flex flex-wrap items-center gap-2" id="categoryPillGroup">
+                    <button data-category="ALL" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm">
+                        <i class="fa-solid fa-layer-group mr-1.5"></i> All Subsystems
+                    </button>
+                    <button data-category="Intake" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 mr-1.5"></i> Intakes
+                    </button>
+                    <button data-category="Outtake & Lift" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
+                        <i class="fa-solid fa-arrow-up-from-bracket text-amber-400 mr-1.5"></i> Outtakes & Lifts
+                    </button>
+                    <button data-category="Shooter / Launcher" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
+                        <i class="fa-solid fa-crosshair text-rose-400 mr-1.5"></i> Launchers
+                    </button>
+                    <button data-category="Transfer" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
+                        <i class="fa-solid fa-arrows-rotate text-purple-400 mr-1.5"></i> Transfers
+                    </button>
+                    <button data-category="Full Robot" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
+                        <i class="fa-solid fa-robot text-cyan-400 mr-1.5"></i> Robot Reveals
+                    </button>
+                </div>
+
+                <!-- CAD Toggle & Counter -->
+                <div class="flex items-center gap-4 text-xs font-mono">
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
+                        <input type="checkbox" id="cadOnlyToggle" class="rounded bg-pitch border-cardBorder text-accentBlue focus:ring-accentBlue">
+                        <span><i class="fa-solid fa-cube text-accentBlue"></i> 3D CAD Models Only</span>
+                    </label>
+                    <div class="text-slate-400">
+                        Matching: <span id="resultsCount" class="text-accentBlue font-bold">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Container -->
+            <section>
+                <div id="mechanismGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Empty Results Placeholder -->
+                <div id="emptyState" class="hidden text-center py-16 bg-cardBg border border-dashed border-cardBorder rounded-3xl max-w-md mx-auto my-8 space-y-4">
+                    <div class="w-14 h-14 rounded-full bg-pitch text-slate-500 flex items-center justify-center mx-auto text-2xl border border-cardBorder">
+                        <i class="fa-solid fa-filter-circle-xmark"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-200">No mechanisms found</h3>
+                        <p class="text-xs text-slate-400 mt-1">Try resetting search keywords or changing season filter.</p>
+                    </div>
+                    <button id="resetFiltersBtn" class="px-4 py-2 rounded-xl bg-accentBlue/20 text-accentBlue border border-accentBlue/40 hover:bg-accentBlue/30 text-xs font-semibold">
+                        Reset All Filters
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="border-t border-cardBorder bg-pitch/80 py-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-white">Mechanism</span><span class="text-accentBlue font-bold">Vault</span>
+                <span>— Open Multi-Media & CAD Archive for FTC Teams</span>
+            </div>
+            <div>
+                Built for FIRST Tech Challenge Community Innovation
+            </div>
+        </div>
+    </footer>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="p-4 sm:p-5 border-b border-cardBorder flex items-start justify-between gap-4 bg-pitch/80">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                        <span id="modalTeamTag" class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-accentBlue/10 text-accentBlue border border-accentBlue/30"></span>
+                        <span id="modalSeasonTag" class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-accentAmber/20 text-accentAmber border border-accentAmber/30 flex items-center gap-1.5"></span>
+                        <span id="modalCategoryTag" class="px-2.5 py-0.5 rounded-md text-xs font-mono font-semibold bg-pitch text-slate-300"></span>
+                    </div>
+                    <h2 id="modalTitle" class="text-lg sm:text-xl font-bold text-white tracking-tight"></h2>
+                </div>
+                <button id="closeDetailModalBtn" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-cardBorder transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal View Switcher Tabs -->
+            <div class="px-5 pt-3 bg-pitch/40 border-b border-cardBorder flex items-center gap-4 text-xs font-mono">
+                <button id="tabMediaBtn" class="px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-play"></i> Video / Media
+                </button>
+                <button id="tabCadBtn" class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cube text-accentBlue"></i> Interactive 3D WebGL CAD
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-slate-300 text-xs sm:text-sm">
+                
+                <!-- Video / Media Container -->
+                <div id="modalMediaContainer" class="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-cardBorder shadow-inner">
+                    <!-- Dynamic Video / Media -->
+                </div>
+
+                <!-- 3D WebGL Canvas Container -->
+                <div id="modal3dCanvasContainer" class="relative w-full aspect-video rounded-xl overflow-hidden bg-pitch border border-cardBorder hidden shadow-inner">
+                    <div id="threeJsViewport" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+                    
+                    <!-- 3D Overlay Controls -->
+                    <div class="absolute bottom-3 left-3 bg-pitch/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-cardBorder text-[11px] font-mono flex items-center gap-3">
+                        <span class="text-slate-400"><i class="fa-solid fa-hand-pointer text-accentBlue"></i> Orbit: Drag | Zoom: Scroll</span>
+                        <button id="reset3dCameraBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-rotate-left"></i> Reset Camera</button>
+                        <button id="toggle3dWireframeBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-border-all"></i> Wireframe</button>
+                    </div>
+                </div>
+
+                <!-- Specs & Control Logic -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-pitch/80 border border-cardBorder">
+                        <h4 class="text-xs font-mono font-bold uppercase text-accentBlue mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-screwdriver-wrench"></i> Bill of Materials (BOM)
+                        </h4>
+                        <ul id="modalHardwareSpecs" class="space-y-1.5 text-xs text-slate-300 list-disc list-inside"></ul>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-pitch/80 border border-cardBorder">
+                        <h4 class="text-xs font-mono font-bold uppercase text-accentAmber mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-code"></i> Software & Motion Control Logic
+                        </h4>
+                        <p id="modalSoftwareNotes" class="text-xs text-slate-300 leading-relaxed font-mono bg-black/50 p-3 rounded-lg border border-cardBorder"></p>
+                    </div>
+                </div>
+
+                <!-- External CAD Link Callout -->
+                <div id="modalCadContainer" class="hidden p-4 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-xs font-mono font-bold text-accentBlue flex items-center gap-2">
+                            <i class="fa-solid fa-cube"></i> Public Onshape / CAD Assembly
+                        </h4>
+                        <p class="text-[11px] text-slate-400">Access original CAD document to measure, export parts, and view assembly hierarchy.</p>
+                    </div>
+                    <a id="modalCadLink" href="#" target="_blank" class="px-3.5 py-2 rounded-lg bg-accentBlue text-white font-semibold text-xs hover:bg-accentBlueHover transition-all flex items-center gap-1.5 shrink-0">
+                        <span>Launch CAD</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-cardBorder bg-pitch/80 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <button id="modalBookmarkToggleBtn" class="px-3.5 py-2 rounded-xl bg-cardBg border border-cardBorder hover:border-accentAmber/60 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
+                        <i class="fa-regular fa-bookmark text-accentAmber"></i> Save to Bookmarks
+                    </button>
+                    <button id="modalCopyLinkBtn" class="px-3.5 py-2 rounded-xl bg-cardBg border border-cardBorder hover:border-accentBlue text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
+                        <i class="fa-regular fa-copy text-accentBlue"></i> Share Link
+                    </button>
+                </div>
+                <a id="modalDirectMediaLink" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border border-blue-500/30 text-xs font-semibold flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-blue-400"></i> Open Original Media
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Side-by-Side Mechanism Compare Modal -->
+    <div id="compareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-cardBorder flex items-center justify-between bg-pitch">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-code-compare text-accentBlue"></i> Side-by-Side Mechanism Comparison
+                </h3>
+                <button id="closeCompareModalBtn" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div id="compareContent" class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Mechanism Modal -->
+    <div id="submitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button id="closeSubmitModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-accentBlue"></i> Submit Mechanism
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Add a new FTC subsystem from CAD, YouTube, Instagram, or team reveals.</p>
+
+            <form id="submissionForm" class="space-y-3.5">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Team # & Name *</label>
+                        <input type="text" id="subTeam" required placeholder="e.g. #11115 Gluten Free" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Season *</label>
+                        <select id="subSeason" required class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                            <option value="BIOBUZZ (2026-2027)">BIOBUZZ (2026-2027)</option>
+                            <option value="DECODE (2025-2026)">DECODE (2025-2026)</option>
+                            <option value="INTO THE DEEP (2024-2025)">INTO THE DEEP (2024-2025)</option>
+                            <option value="CENTERSTAGE (2023-2024)">CENTERSTAGE (2023-2024)</option>
+                            <option value="POWERPLAY (2022-2023)">POWERPLAY (2022-2023)</option>
+                            <option value="FREIGHT FRENZY (2021-2022)">FREIGHT FRENZY (2021-2022)</option>
+                            <option value="ULTIMATE GOAL (2020-2021)">ULTIMATE GOAL (2020-2021)</option>
+                            <option value="SKYSTONE (2019-2020)">SKYSTONE (2019-2020)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-300 mb-1">Mechanism Title *</label>
+                    <input type="text" id="subTitle" required placeholder="e.g. Active Spintake & Differential Wrist" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Subsystem Category *</label>
+                        <select id="subCategory" required class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                            <option value="Intake">Intake</option>
+                            <option value="Outtake & Lift">Outtake & Lift</option>
+                            <option value="Shooter / Launcher">Shooter / Launcher</option>
+                            <option value="Transfer">Transfer / Passthrough</option>
+                            <option value="Full Robot">Full Robot Reveal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">3D CAD Preset Model</label>
+                        <select id="subCad3dType" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                            <option value="ELEVATOR">Viper Slide Linear Elevator</option>
+                            <option value="FLYWHEEL">Dual Flywheel Launcher</option>
+                            <option value="SPINTAKE">Active Spintake Roller</option>
+                            <option value="CLAW">Articulated Servo Claw</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Media Link (YouTube / Instagram) *</label>
+                        <input type="url" id="subVideoUrl" required placeholder="https://youtube.com or instagram.com..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Onshape / CAD URL (Optional)</label>
+                        <input type="url" id="subCadUrl" placeholder="https://cad.onshape.com/..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-300 mb-1">Components / BOM (Comma separated)</label>
+                    <input type="text" id="subHardware" placeholder="e.g. Viper Slide, Axon Servos, Green Compliant Wheels" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-mono text-slate-300 mb-1">Software Logic / Control Notes</label>
+                    <textarea id="subSoftware" rows="2" placeholder="e.g. Velocity PIDF control with auto-alignment." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none"></textarea>
+                </div>
+
+                <button type="submit" id="submitFormBtn" class="w-full py-2.5 rounded-xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-xs shadow-lg glow-blue-sm transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Broadcast Mechanism to Vault</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bookmarks Drawer -->
+    <div id="bookmarksDrawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-cardBg border-l border-cardBorder shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-cardBorder flex items-center justify-between bg-pitch">
+            <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-bookmark text-accentAmber"></i> Saved Bookmarks
+            </h3>
+            <button id="closeBookmarksDrawerBtn" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </button>
+        </div>
+        <div id="bookmarksList" class="p-4 flex-1 overflow-y-auto space-y-3">
+            <!-- Dynamic bookmarks populated via JS -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ftc-mechanism-vault-prod';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBV548Ivq4bi96nml5QiIMASm65olO-Dcc",
+            authDomain: "ftc-mechanism-vault.firebaseapp.com",
+            projectId: "ftc-mechanism-vault",
+            storageBucket: "ftc-mechanism-vault.firebasestorage.app",
+            messagingSenderId: "133452112607",
+            appId: "1:133452112607:web:16622a953b5f75dee6ff6a"
+        };
+
+        let app, auth, db;
+        let isFirebaseConnected = false;
+
+        // Default dataset with YouTube, Instagram, and CAD sources
+        const initialMechanisms = [
+            // BIOBUZZ (2026-2027)
+            {
+                id: 'mech-bio-1',
+                team: 'FTC #16460 GEarheads',
+                title: 'BIOBUZZ Ri30H Active Floating Spintake & Pollen Dropper',
+                season: 'BIOBUZZ (2026-2027)',
+                seasonKey: '2026-2027',
+                seasonIcon: 'fa-solid fa-bug',
+                category: 'Intake',
+                mediaType: 'YouTube',
+                youtubeId: '_JU4qY0d6T0',
+                mediaUrl: 'https://www.youtube.com/watch?v=_JU4qY0d6T0',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'SPINTAKE',
+                specs: ['Dual goBILDA 1150RPM Yellowjackets', 'Custom 3D Printed Pollen Dropper', 'Compliant Roller Intake'],
+                software: 'REV Color Sensor V3 detects game element color and triggers auto-reverse intake feed.'
+            },
+            {
+                id: 'mech-bio-2',
+                team: 'FTC #19049 High Five',
+                title: 'BIOBUZZ Pollen Conveyor & Stage-2 Viper Slide',
+                season: 'BIOBUZZ (2026-2027)',
+                seasonKey: '2026-2027',
+                seasonIcon: 'fa-solid fa-bug',
+                category: 'Transfer',
+                mediaType: 'Instagram',
+                youtubeId: '',
+                mediaUrl: 'https://www.instagram.com',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'ELEVATOR',
+                specs: ['goBILDA Viper Slide Stage 2', 'Neoprene High-Friction Belt', 'Axon Micro Servo Indexer'],
+                software: 'Continuous velocity PID control on transfer conveyor belt with sensor latching.'
+            },
+
+            // DECODE (2025-2026)
+            {
+                id: 'mech-decode-1',
+                team: 'FTC #11115 Gluten Free',
+                title: 'DECODE High-Speed Ring Roller Intake & Dual Flywheel',
+                season: 'DECODE (2025-2026)',
+                seasonKey: '2025-2026',
+                seasonIcon: 'fa-solid fa-code',
+                category: 'Shooter / Launcher',
+                mediaType: 'YouTube',
+                youtubeId: '71u27jwLz_U',
+                mediaUrl: 'https://www.youtube.com/watch?v=71u27jwLz_U',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'FLYWHEEL',
+                specs: ['Dual-stage Flywheel Shooter (6000 RPM)', 'Polycarbonate Active Sorter', 'Limelight 3G Vision Tracker'],
+                software: 'Interpolated flywheel velocity lookup table driven by Limelight distance estimation.'
+            },
+
+            // INTO THE DEEP (2024-2025)
+            {
+                id: 'mech-itd-1',
+                team: 'FTC #23224 Cheesy Bytes',
+                title: 'Into The Deep High-OPR Active Spintake & Extension',
+                season: 'INTO THE DEEP (2024-2025)',
+                seasonKey: '2024-2025',
+                seasonIcon: 'fa-solid fa-water',
+                category: 'Full Robot',
+                mediaType: 'YouTube',
+                youtubeId: 'FnioJBsmkF4',
+                mediaUrl: 'https://www.youtube.com/watch?v=FnioJBsmkF4',
+                hasCad: false,
+                specs: ['Active Spintake with surgical tubing', 'Dual-stage continuous linear slides', 'Dual Specimen Claw'],
+                software: 'Custom Motion Profiling PIDF for rapid linear deceleration without spilling samples.'
+            },
+            {
+                id: 'mech-itd-2',
+                team: 'FTC #18457 Wolfpack Robotics',
+                title: 'Into The Deep High Bucket Telescope & Axon Dual Claw',
+                season: 'INTO THE DEEP (2024-2025)',
+                seasonKey: '2024-2025',
+                seasonIcon: 'fa-solid fa-water',
+                category: 'Outtake & Lift',
+                mediaType: 'Instagram',
+                youtubeId: '',
+                mediaUrl: 'https://www.instagram.com',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'CLAW',
+                specs: ['Axon MAX Servo Dual Claw', 'Carbon Fiber Telescoping Slide', 'Magnetic Limit Switches'],
+                software: 'Finite state machine coordinates wrist rotation and latch in 0.3 seconds.'
+            },
+
+            // CENTERSTAGE (2023-2024)
+            {
+                id: 'mech-cs-1',
+                team: 'FTC #19502 The Moment Makers',
+                title: 'Centerstage Active Roller Intake & 3D Printed Pixel Box',
+                season: 'CENTERSTAGE (2023-2024)',
+                seasonKey: '2023-2024',
+                seasonIcon: 'fa-solid fa-masks-theater',
+                category: 'Intake',
+                mediaType: 'YouTube',
+                youtubeId: 'jin-BPGvmJE',
+                mediaUrl: 'https://www.youtube.com/watch?v=jin-BPGvmJE',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'SPINTAKE',
+                specs: ['35mm Green Compliant Wheels', 'Surgical Tubing Roller', 'MISUMI Linear Rail'],
+                software: 'Laser distance sensors auto-stop intake when two pixels are clamped.'
+            },
+
+            // POWERPLAY (2022-2023)
+            {
+                id: 'mech-pp-1',
+                team: 'FTC #5741 RoboHawks',
+                title: 'Powerplay Passive Cone Grabber Claw & High Junction Slide',
+                season: 'POWERPLAY (2022-2023)',
+                seasonKey: '2022-2023',
+                seasonIcon: 'fa-solid fa-bolt',
+                category: 'Outtake & Lift',
+                mediaType: 'YouTube',
+                youtubeId: '4RmpBldUBUo',
+                mediaUrl: 'https://www.youtube.com/watch?v=4RmpBldUBUo',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'ELEVATOR',
+                specs: ['Spring-Loaded Passive Cone Beak', 'goBILDA 435RPM Viper Slide Stack', 'Custom CNC Linkage'],
+                software: 'Gravity feed-forward PID prevents slide sag under heavy junction cone loads.'
+            },
+
+            // FREIGHT FRENZY (2021-2022)
+            {
+                id: 'mech-ff-1',
+                team: 'FTC #8393 Brain Stem',
+                title: 'Freight Frenzy Compliant Spinner Intake & Box Dumper',
+                season: 'FREIGHT FRENZY (2021-2022)',
+                seasonKey: '2021-2022',
+                seasonIcon: 'fa-solid fa-box',
+                category: 'Intake',
+                mediaType: 'YouTube',
+                youtubeId: '_JU4qY0d6T0',
+                mediaUrl: 'https://www.youtube.com/watch?v=_JU4qY0d6T0',
+                hasCad: false,
+                specs: ['AndyMark Compliant Wheels', 'Virtual 4-Bar Pivot Linkage', 'REV Core Hex Motor'],
+                software: 'Heading stabilization IMU loop keeps robot steady while sweeping freight.'
+            },
+
+            // ULTIMATE GOAL (2020-2021)
+            {
+                id: 'mech-ug-1',
+                team: 'FTC #14496 Roboforce',
+                title: 'Ultimate Goal Single Flywheel High Goal Ring Launcher',
+                season: 'ULTIMATE GOAL (2020-2021)',
+                seasonKey: '2020-2021',
+                seasonIcon: 'fa-solid fa-bullseye',
+                category: 'Shooter / Launcher',
+                mediaType: 'YouTube',
+                youtubeId: '71u27jwLz_U',
+                mediaUrl: 'https://www.youtube.com/watch?v=71u27jwLz_U',
+                hasCad: true,
+                cadUrl: 'https://cad.onshape.com',
+                cad3dType: 'FLYWHEEL',
+                specs: ['Single 4-inch HD Flywheel with Curved Arch', 'Servo Ring Indexer'],
+                software: 'Encoder velocity feedback loops maintain high RPM consistency during 3-ring bursts.'
+            },
+
+            // SKYSTONE (2019-2020)
+            {
+                id: 'mech-sky-1',
+                team: 'FTC #11115 Gluten Free',
+                title: 'Skystone Side-Wheel Grabber & Foundation Latching Arms',
+                season: 'SKYSTONE (2019-2020)',
+                seasonKey: '2019-2020',
+                seasonIcon: 'fa-solid fa-cubes-stacked',
+                category: 'Full Robot',
+                mediaType: 'YouTube',
+                youtubeId: '71u27jwLz_U',
+                mediaUrl: 'https://www.youtube.com/watch?v=71u27jwLz_U',
+                hasCad: false,
+                specs: ['Active Side Compliant Wheel Intake', 'Continuous Cable Slide', 'Dual Foundation Hooks'],
+                software: 'Sub-millimeter dead-reckoning odometry tracking with rapid path planning.'
+            }
+        ];
+
+        // Seasons List with Specific Game Symbols
+        const seasonsList = [
+            { label: 'All Seasons', key: 'ALL', icon: 'fa-solid fa-layer-group' },
+            { label: 'BIOBUZZ (2026-2027)', key: '2026-2027', icon: 'fa-solid fa-bug', badge: 'NEW' },
+            { label: 'DECODE (2025-2026)', key: '2025-2026', icon: 'fa-solid fa-code' },
+            { label: 'INTO THE DEEP (2024-2025)', key: '2024-2025', icon: 'fa-solid fa-water' },
+            { label: 'CENTERSTAGE (2023-2024)', key: '2023-2024', icon: 'fa-solid fa-masks-theater' },
+            { label: 'POWERPLAY (2022-2023)', key: '2022-2023', icon: 'fa-solid fa-bolt' },
+            { label: 'FREIGHT FRENZY (2021-2022)', key: '2021-2022', icon: 'fa-solid fa-box' },
+            { label: 'ULTIMATE GOAL (2020-2021)', key: '2020-2021', icon: 'fa-solid fa-bullseye' },
+            { label: 'SKYSTONE (2019-2020)', key: '2019-2020', icon: 'fa-solid fa-cubes-stacked' }
+        ];
+
+        let mechanismsData = [];
+        let currentView = 'home'; // 'home' | 'vault'
+        let activeSeasonKey = 'ALL';
+        let activeCategory = 'ALL';
+        let searchQuery = '';
+        let showCadOnly = false;
+        let bookmarkedIds = new Set();
+        let compareIds = new Set();
+        let currentModalMech = null;
+
+        let scene3d, camera3d, renderer3d, controls3d, currentMesh3d, animReq3d;
+        let isWireframe3d = false;
+
+        function switchView(targetView) {
+            currentView = targetView;
+            const homeView = document.getElementById('homeView');
+            const vaultView = document.getElementById('vaultView');
+            const navHomeBtn = document.getElementById('navHomeBtn');
+            const navVaultBtn = document.getElementById('navVaultBtn');
+
+            if (targetView === 'home') {
+                homeView.classList.remove('hidden');
+                vaultView.classList.add('hidden');
+                navHomeBtn.className = "px-3 py-2 rounded-lg text-white hover:text-accentBlue transition-colors font-bold flex items-center gap-1.5 border-b-2 border-accentBlue";
+                navVaultBtn.className = "px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold flex items-center gap-1.5 border-b-2 border-transparent";
+            } else {
+                homeView.classList.add('hidden');
+                vaultView.classList.remove('hidden');
+                navHomeBtn.className = "px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold flex items-center gap-1.5 border-b-2 border-transparent";
+                navVaultBtn.className = "px-3 py-2 rounded-lg text-white hover:text-accentBlue transition-colors font-bold flex items-center gap-1.5 border-b-2 border-accentBlue";
+                filterAndRenderGrid();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                const mechsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'mechanisms');
+                onSnapshot(mechsColRef, (snapshot) => {
+                    const cloudMechs = [];
+                    snapshot.forEach((docSnap) => {
+                        cloudMechs.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+
+                    if (cloudMechs.length === 0) {
+                        seedInitialData(mechsColRef);
+                    } else {
+                        mechanismsData = cloudMechs;
+                        localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
+                        filterAndRenderGrid();
+                    }
+                }, (err) => {
+                    console.warn("Firestore listener fallback:", err);
+                    loadLocalData();
+                });
+
+                isFirebaseConnected = true;
+
+            } catch (err) {
+                console.warn("Firebase initialization fallback:", err);
+                loadLocalData();
+            }
+        }
+
+        async function seedInitialData(colRef) {
+            mechanismsData = [...initialMechanisms];
+            filterAndRenderGrid();
+
+            for (const mech of initialMechanisms) {
+                try {
+                    await setDoc(doc(colRef, mech.id), mech);
+                } catch (e) {
+                    console.error("Error seeding document:", e);
+                }
+            }
+        }
+
+        function loadLocalData() {
+            const saved = localStorage.getItem('ftc_mechs_blue_v2');
+            if (saved) {
+                mechanismsData = JSON.parse(saved);
+            } else {
+                mechanismsData = [...initialMechanisms];
+                localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
+            }
+            filterAndRenderGrid();
+        }
+
+        function renderSeasonTimeline() {
+            const container = document.getElementById('seasonTimelineContainer');
+            container.innerHTML = seasonsList.map(s => {
+                const isActive = s.key === activeSeasonKey;
+                return `
+                    <button data-season-key="${s.key}" class="timeline-btn snap-start shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-2 border ${
+                        isActive 
+                        ? 'bg-accentBlue text-white border-accentBlue shadow-lg glow-blue-sm font-bold' 
+                        : 'bg-cardBg border-cardBorder text-slate-400 hover:border-slate-500 hover:text-slate-200'
+                    }">
+                        <i class="${s.icon} ${isActive ? 'text-cyan-300' : 'text-accentBlue'} text-sm"></i>
+                        <span>${s.label}</span>
+                        ${s.badge ? `<span class="px-1.5 py-0.2 text-[9px] rounded bg-accentAmber text-pitch font-extrabold">${s.badge}</span>` : ''}
+                    </button>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.timeline-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const key = e.currentTarget.getAttribute('data-season-key');
+                    activeSeasonKey = key;
+                    const seasonObj = seasonsList.find(s => s.key === key);
+                    document.getElementById('activeSeasonBadge').innerText = `Active: ${seasonObj ? seasonObj.label : 'All Seasons'}`;
+                    renderSeasonTimeline();
+                    filterAndRenderGrid();
+                });
+            });
+        }
+
+        function updateCounterStats(matchingCount) {
+            const statTotal = document.getElementById('statTotalMechs');
+            const statCad = document.getElementById('statCadModels');
+            const statVideo = document.getElementById('statVideoReveals');
+
+            const cadCount = mechanismsData.filter(m => m.hasCad).length;
+            const videoCount = mechanismsData.filter(m => m.youtubeId || (m.mediaUrl && m.mediaUrl.includes('instagram'))).length;
+
+            if (statTotal) statTotal.innerText = matchingCount !== undefined ? matchingCount : mechanismsData.length;
+            if (statCad) statCad.innerText = cadCount;
+            if (statVideo) statVideo.innerText = videoCount;
+
+            const bannerTitle = document.getElementById('archiveBannerTitle');
+            const bannerBadge = document.getElementById('archiveBannerSeasonBadge');
+
+            if (activeSeasonKey === 'ALL') {
+                if (bannerTitle) bannerTitle.innerText = 'FTC Mechanism Vault & Historical Archive';
+                if (bannerBadge) bannerBadge.innerText = 'ALL SEASONS';
+            } else {
+                const sObj = seasonsList.find(s => s.key === activeSeasonKey);
+                if (sObj) {
+                    if (bannerTitle) bannerTitle.innerText = `${sObj.label} ARCHIVE`;
+                    if (bannerBadge) bannerBadge.innerText = sObj.key;
+                }
+            }
+        }
+
+        function filterAndRenderGrid() {
+            const filtered = mechanismsData.filter(m => {
+                const matchesSeason = activeSeasonKey === 'ALL' || m.seasonKey === activeSeasonKey;
+                const matchesCategory = activeCategory === 'ALL' || m.category === activeCategory;
+                const matchesCad = !showCadOnly || m.hasCad;
+
+                const query = searchQuery.toLowerCase().trim();
+                const matchesSearch = !query || 
+                    m.title.toLowerCase().includes(query) ||
+                    m.team.toLowerCase().includes(query) ||
+                    m.season.toLowerCase().includes(query) ||
+                    m.category.toLowerCase().includes(query) ||
+                    (m.specs && m.specs.some(s => s.toLowerCase().includes(query)));
+
+                return matchesSeason && matchesCategory && matchesCad && matchesSearch;
+            });
+
+            document.getElementById('resultsCount').innerText = filtered.length;
+            updateCounterStats(filtered.length);
+
+            const grid = document.getElementById('mechanismGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            grid.innerHTML = filtered.map(m => {
+                const isBookmarked = bookmarkedIds.has(m.id);
+                const isCompared = compareIds.has(m.id);
+
+                let mediaBadge = '';
+                if (m.hasCad) {
+                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-accentBlue text-white flex items-center gap-1 shadow-md"><i class="fa-solid fa-cube"></i> 3D CAD MODEL</span>`;
+                } else if (m.youtubeId) {
+                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-600 text-white flex items-center gap-1"><i class="fa-brands fa-youtube"></i> YOUTUBE</span>`;
+                } else if (m.mediaUrl && m.mediaUrl.includes('instagram')) {
+                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-pink-600 text-white flex items-center gap-1"><i class="fa-brands fa-instagram"></i> INSTAGRAM</span>`;
+                } else {
+                    mediaBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-200 flex items-center gap-1"><i class="fa-solid fa-link"></i> MEDIA LINK</span>`;
+                }
+
+                let thumbnailHtml = '';
+                const isInstagram = m.mediaType === 'Instagram' || (m.mediaUrl && m.mediaUrl.includes('instagram'));
+
+                if (m.thumbnailUrl) {
+                    thumbnailHtml = `<img src="${m.thumbnailUrl}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85 group-hover:opacity-100" onerror="this.src='https://placehold.co/600x337/0f172a/2563EB?text=FTC+Mechanism'">`;
+                } else if (m.youtubeId) {
+                    const thumbUrl = `https://img.youtube.com/vi/${m.youtubeId}/hqdefault.jpg`;
+                    thumbnailHtml = `<img src="${thumbUrl}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85 group-hover:opacity-100" onerror="this.src='https://placehold.co/600x337/0f172a/2563EB?text=FTC+Mechanism'">`;
+                } else if (isInstagram) {
+                    thumbnailHtml = `
+                        <div class="w-full h-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex flex-col items-center justify-center relative p-4 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                            <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
+                            <div class="relative z-10 flex flex-col items-center text-center space-y-1.5">
+                                <div class="w-11 h-11 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-2xl shadow-xl border border-white/30 group-hover:scale-110 transition-transform">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </div>
+                                <span class="text-[10px] font-mono font-black tracking-wider text-white uppercase bg-black/40 px-2.5 py-0.5 rounded-full border border-white/20 shadow-sm">Instagram Reel</span>
+                                <span class="text-[11px] font-bold text-white/90 max-w-[180px] truncate">${m.team}</span>
+                            </div>
+                            <div class="absolute bottom-2.5 right-2.5 z-10 text-white/90 text-[10px] font-mono font-bold flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md border border-white/10">
+                                <i class="fa-solid fa-play text-[9px] text-pink-400"></i> Watch Reel
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    thumbnailHtml = `
+                        <div class="w-full h-full bg-gradient-to-br from-slate-900 via-cyberSlate to-accentDarkBlue flex flex-col items-center justify-center relative p-4 group-hover:scale-105 transition-transform duration-300">
+                            <div class="w-10 h-10 rounded-2xl bg-accentBlue/20 border border-accentBlue/40 flex items-center justify-center text-accentBlue text-xl mb-1.5">
+                                <i class="fa-solid fa-cube"></i>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-300 max-w-[180px] truncate text-center">${m.title}</span>
+                        </div>
+                    `;
+                }
+
+                const sObj = seasonsList.find(s => s.key === m.seasonKey);
+                const seasonIcon = sObj ? sObj.icon : (m.seasonIcon || 'fa-solid fa-layer-group');
+
+                return `
+                    <div class="mech-card bg-cardBg border border-cardBorder hover:border-accentBlue/60 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col cursor-pointer group" data-id="${m.id}">
+                        <div class="relative aspect-video bg-black overflow-hidden">
+                            ${thumbnailHtml}
+                            <div class="absolute top-2.5 left-2.5 flex items-center gap-2 z-10">
+                                ${mediaBadge}
+                            </div>
+                            <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
+                                <button class="card-compare-btn p-2 rounded-xl bg-pitch/80 hover:bg-pitch text-slate-300 hover:text-accentBlue transition-colors backdrop-blur-sm" data-id="${m.id}" title="Compare Mechanism">
+                                    <i class="fa-solid fa-code-compare text-sm ${isCompared ? 'text-accentBlue font-bold' : ''}"></i>
+                                </button>
+                                <button class="card-bookmark-btn p-2 rounded-xl bg-pitch/80 hover:bg-pitch text-slate-300 hover:text-accentAmber transition-colors backdrop-blur-sm" data-id="${m.id}" title="Bookmark Mechanism">
+                                    <i class="${isBookmarked ? 'fa-solid text-accentAmber' : 'fa-regular'} fa-bookmark text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-1.5">
+                                    <span class="text-accentBlue font-bold truncate max-w-[150px]">${m.team}</span>
+                                    <span class="text-[10px] bg-pitch px-2 py-0.5 rounded border border-cardBorder flex items-center gap-1.5"><i class="${seasonIcon} text-accentBlue"></i> ${m.seasonKey}</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-100 group-hover:text-accentBlue transition-colors line-clamp-2 leading-snug">
+                                    ${m.title}
+                                </h3>
+                            </div>
+                            ${m.specs && m.specs.length > 0 ? `
+                            <div class="pt-2 border-t border-cardBorder/60 space-y-1">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">KEY COMPONENTS</span>
+                                <ul class="space-y-0.5 text-xs text-slate-300">
+                                    ${m.specs.slice(0, 2).map(s => `<li class="truncate flex items-center gap-1.5"><i class="fa-solid fa-check text-accentBlue text-[9px]"></i> ${s}</li>`).join('')}
+                                </ul>
+                            </div>` : ''}
+                            <div class="pt-2 flex items-center justify-between text-xs font-bold text-accentBlue group-hover:translate-x-1 transition-transform uppercase tracking-wider font-mono">
+                                <span>Inspect Design & Specs</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Add click listeners to cards
+            document.querySelectorAll('.mech-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.card-bookmark-btn') || e.target.closest('.card-compare-btn')) return;
+                    const id = card.getAttribute('data-id');
+                    const m = mechanismsData.find(item => item.id === id);
+                    if (m) openDetailModal(m);
+                });
+            });
+
+            document.querySelectorAll('.card-bookmark-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    toggleBookmark(id);
+                });
+            });
+
+            document.querySelectorAll('.card-compare-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    toggleCompare(id);
+                });
+            });
+        }
+
+        function toggleBookmark(id) {
+            if (bookmarkedIds.has(id)) {
+                bookmarkedIds.delete(id);
+            } else {
+                bookmarkedIds.add(id);
+            }
+            updateBookmarkUI();
+            filterAndRenderGrid();
+            renderBookmarksDrawer();
+        }
+
+        function toggleCompare(id) {
+            if (compareIds.has(id)) {
+                compareIds.delete(id);
+            } else {
+                if (compareIds.size >= 2) {
+                    const first = compareIds.values().next().value;
+                    compareIds.delete(first);
+                }
+                compareIds.add(id);
+            }
+            updateCompareUI();
+            filterAndRenderGrid();
+        }
+
+        function updateBookmarkUI() {
+            const count = bookmarkedIds.size;
+            const badge = document.getElementById('bookmarkCountBadge');
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if (currentModalMech) {
+                const modalBtn = document.getElementById('modalBookmarkToggleBtn');
+                const isBookmarked = bookmarkedIds.has(currentModalMech.id);
+                modalBtn.innerHTML = `
+                    <i class="${isBookmarked ? 'fa-solid' : 'fa-regular'} fa-bookmark text-accentAmber"></i>
+                    <span>${isBookmarked ? 'Saved in Bookmarks' : 'Save to Bookmarks'}</span>
+                `;
+            }
+        }
+
+        function updateCompareUI() {
+            const count = compareIds.size;
+            const badge = document.getElementById('compareCountBadge');
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderBookmarksDrawer() {
+            const container = document.getElementById('bookmarksList');
+            if (bookmarkedIds.size === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-500 text-xs font-mono">
+                        <i class="fa-regular fa-bookmark text-2xl mb-2 text-slate-600"></i>
+                        <p>No saved mechanisms yet.</p>
+                        <p class="text-[10px] text-slate-600 mt-1">Click the bookmark icon on any card.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const bookmarkedMechs = mechanismsData.filter(m => bookmarkedIds.has(m.id));
+            container.innerHTML = bookmarkedMechs.map(m => `
+                <div class="p-3 bg-pitch border border-cardBorder rounded-xl flex items-center justify-between gap-3 group hover:border-accentBlue/50 transition-all">
+                    <div class="flex-1 min-w-0 cursor-pointer" onclick="openDetailModalById('${m.id}')">
+                        <span class="text-[10px] font-mono text-accentBlue font-bold block truncate">${m.team}</span>
+                        <h4 class="text-xs font-bold text-slate-200 group-hover:text-accentBlue transition-colors truncate">${m.title}</h4>
+                        <span class="text-[10px] text-slate-500 font-mono">${m.seasonKey}</span>
+                    </div>
+                    <button onclick="toggleBookmark('${m.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 transition-colors" title="Remove Bookmark">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.openDetailModalById = function(id) {
+            const m = mechanismsData.find(item => item.id === id);
+            if (m) openDetailModal(m);
+        };
+
+        window.toggleBookmark = toggleBookmark;
+
+        function init3dViewport() {
+            const container = document.getElementById('threeJsViewport');
+            if (!container || scene3d) return;
+
+            scene3d = new THREE.Scene();
+            scene3d.background = new THREE.Color(0x020617);
+
+            camera3d = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera3d.position.set(20, 18, 25);
+
+            renderer3d = new THREE.WebGLRenderer({ antialias: true });
+            renderer3d.setSize(container.clientWidth, container.clientHeight);
+            renderer3d.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer3d.domElement);
+
+            controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
+            controls3d.enableDamping = true;
+            controls3d.dampingFactor = 0.05;
+
+            // Ambient & Directional Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene3d.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x2563EB, 1.2);
+            dirLight.position.set(20, 30, 20);
+            scene3d.add(dirLight);
+
+            const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+            dirLight2.position.set(-20, -10, -20);
+            scene3d.add(dirLight2);
+
+            // Grid helper
+            const gridHelper = new THREE.GridHelper(40, 20, 0x2563EB, 0x1e293b);
+            gridHelper.position.y = -5;
+            scene3d.add(gridHelper);
+
+            function animate3d() {
+                animReq3d = requestAnimationFrame(animate3d);
+                if (currentMesh3d) {
+                    currentMesh3d.rotation.y += 0.005;
+                }
+                controls3d.update();
+                renderer3d.render(scene3d, camera3d);
+            }
+            animate3d();
+
+            window.addEventListener('resize', () => {
+                if (!container || !renderer3d) return;
+                camera3d.aspect = container.clientWidth / container.clientHeight;
+                camera3d.updateProjectionMatrix();
+                renderer3d.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        function load3dMechanismModel(type) {
+            init3dViewport();
+            if (currentMesh3d) {
+                scene3d.remove(currentMesh3d);
+            }
+
+            const group = new THREE.Group();
+            const materialOptions = { wireframe: isWireframe3d };
+
+            if (type === 'ELEVATOR') {
+                const alumMat = new THREE.MeshStandardMaterial({ color: 0x94A3B8, metalness: 0.8, roughness: 0.2, ...materialOptions });
+                const blueMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
+
+                const base = new THREE.Mesh(new THREE.BoxGeometry(2, 16, 1), alumMat);
+                base.position.set(-2, 3, 0);
+                group.add(base);
+
+                const stage2 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 14, 0.8), blueMat);
+                stage2.position.set(0, 7, 0);
+                group.add(stage2);
+
+                const carriage = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 3), new THREE.MeshStandardMaterial({ color: 0x1e293b, ...materialOptions }));
+                carriage.position.set(1, 12, 0);
+                group.add(carriage);
+
+            } else if (type === 'FLYWHEEL') {
+                const wheelMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.4, ...materialOptions });
+                const chassisMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, ...materialOptions });
+
+                const wheelGeom = new THREE.CylinderGeometry(4, 4, 1.5, 24);
+                const wheel1 = new THREE.Mesh(wheelGeom, wheelMat);
+                wheel1.rotation.z = Math.PI / 2;
+                wheel1.position.set(-3.5, 2, 0);
+
+                const wheel2 = new THREE.Mesh(wheelGeom, wheelMat);
+                wheel2.rotation.z = Math.PI / 2;
+                wheel2.position.set(3.5, 2, 0);
+
+                group.add(wheel1);
+                group.add(wheel2);
+
+                const frame = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 8), chassisMat);
+                frame.position.set(0, -2, 0);
+                group.add(frame);
+
+            } else if (type === 'SPINTAKE') {
+                const axleMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, metalness: 0.9, ...materialOptions });
+                const blueWheelMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
+
+                const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 16, 16), axleMat);
+                axle.rotation.z = Math.PI / 2;
+                group.add(axle);
+
+                for (let x = -6; x <= 6; x += 3) {
+                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.8, 20), blueWheelMat);
+                    wheel.rotation.z = Math.PI / 2;
+                    wheel.position.x = x;
+                    group.add(wheel);
+                }
+
+            } else {
+                // Articulated Servo Claw
+                const servoMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5, ...materialOptions });
+                const fingerMat = new THREE.MeshStandardMaterial({ color: 0x2563EB, roughness: 0.3, ...materialOptions });
+
+                const body = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 4), servoMat);
+                group.add(body);
+
+                const finger1 = new THREE.Mesh(new THREE.BoxGeometry(1, 6, 1), fingerMat);
+                finger1.position.set(-2, 4, 2);
+                finger1.rotation.x = -0.3;
+
+                const finger2 = new THREE.Mesh(new THREE.BoxGeometry(1, 6, 1), fingerMat);
+                finger2.position.set(2, 4, 2);
+                finger2.rotation.x = -0.3;
+
+                group.add(finger1);
+                group.add(finger2);
+            }
+
+            currentMesh3d = group;
+            scene3d.add(currentMesh3d);
+        }
+
+        function openDetailModal(m) {
+            currentModalMech = m;
+            document.getElementById('modalTeamTag').innerText = m.team;
+            
+            const sObj = seasonsList.find(s => s.key === m.seasonKey);
+            const seasonIcon = sObj ? sObj.icon : (m.seasonIcon || 'fa-solid fa-layer-group');
+            document.getElementById('modalSeasonTag').innerHTML = `<i class="${seasonIcon}"></i> ${m.season}`;
+            
+            document.getElementById('modalCategoryTag').innerText = m.category;
+            document.getElementById('modalTitle').innerText = m.title;
+
+            const mediaContainer = document.getElementById('modalMediaContainer');
+            const canvas3dContainer = document.getElementById('modal3dCanvasContainer');
+            const tabMediaBtn = document.getElementById('tabMediaBtn');
+            const tabCadBtn = document.getElementById('tabCadBtn');
+
+            // Default view: Media tab
+            mediaContainer.classList.remove('hidden');
+            canvas3dContainer.classList.add('hidden');
+            tabMediaBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+            tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+
+            if (m.youtubeId) {
+                mediaContainer.innerHTML = `
+                    <iframe src="https://www.youtube.com/embed/${m.youtubeId}?autoplay=1&mute=0" 
+                            title="${m.title}" class="w-full h-full" frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                `;
+            } else if (m.mediaUrl && m.mediaUrl.includes('instagram')) {
+                mediaContainer.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center p-6 bg-pitch text-center space-y-3">
+                        <i class="fa-brands fa-instagram text-5xl text-pink-500 animate-pulse"></i>
+                        <h4 class="text-sm font-bold text-slate-200">Instagram Reel / Clip Showcase</h4>
+                        <p class="text-xs text-slate-400 max-w-sm">This mechanism was shared on Instagram reels. Click below to view full video post.</p>
+                        <a href="${m.mediaUrl}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-pink-600 text-white font-bold text-xs flex items-center gap-2">
+                            <i class="fa-brands fa-instagram"></i> Open Reel on Instagram
+                        </a>
+                    </div>
+                `;
+            } else {
+                mediaContainer.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center p-6 bg-pitch text-center space-y-3">
+                        <i class="fa-solid fa-cube text-5xl text-accentBlue animate-pulse"></i>
+                        <h4 class="text-sm font-bold text-slate-200">Interactive 3D WebGL CAD Model Available</h4>
+                        <p class="text-xs text-slate-400 max-w-sm">Switch to the "Interactive 3D WebGL CAD" tab above to orbit and inspect this assembly.</p>
+                    </div>
+                `;
+            }
+
+            const specsList = document.getElementById('modalHardwareSpecs');
+            if (m.specs && m.specs.length > 0) {
+                specsList.innerHTML = m.specs.map(s => `<li>${s}</li>`).join('');
+            } else {
+                specsList.innerHTML = `<li class="text-slate-500 italic">No hardware BOM provided.</li>`;
+            }
+
+            document.getElementById('modalSoftwareNotes').innerText = m.software || 'Standard FTC control algorithm.';
+
+            const cadContainer = document.getElementById('modalCadContainer');
+            if (m.hasCad) {
+                cadContainer.classList.remove('hidden');
+                document.getElementById('modalCadLink').href = m.cadUrl || '#';
+            } else {
+                cadContainer.classList.add('hidden');
+            }
+
+            document.getElementById('modalDirectMediaLink').href = m.mediaUrl || '#';
+
+            updateBookmarkUI();
+
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('hidden');
+
+            load3dMechanismModel(m.cad3dType || 'ELEVATOR');
+        }
+
+        function openCompareModal() {
+            const modal = document.getElementById('compareModal');
+            const container = document.getElementById('compareContent');
+
+            if (compareIds.size === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 text-center py-12 text-slate-500 font-mono">
+                        <i class="fa-solid fa-code-compare text-3xl mb-3 text-slate-600"></i>
+                        <p>No mechanisms selected for comparison.</p>
+                        <p class="text-[11px] text-slate-600 mt-1">Click the compare icon on any 2 mechanism cards to compare specs.</p>
+                    </div>
+                `;
+            } else {
+                const selectedMechs = mechanismsData.filter(m => compareIds.has(m.id));
+                container.innerHTML = selectedMechs.map(m => `
+                    <div class="bg-pitch border border-cardBorder rounded-xl p-5 space-y-4">
+                        <div class="border-b border-cardBorder pb-3">
+                            <span class="text-xs font-mono font-bold text-accentBlue">${m.team}</span>
+                            <h3 class="text-base font-bold text-slate-100">${m.title}</h3>
+                            <span class="text-[11px] font-mono text-accentAmber">${m.season}</span>
+                        </div>
+                        <div>
+                            <h4 class="font-mono text-slate-400 font-bold uppercase mb-1">Category</h4>
+                            <p class="text-slate-200 font-semibold">${m.category}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-mono text-slate-400 font-bold uppercase mb-1">Hardware BOM</h4>
+                            <ul class="list-disc list-inside space-y-1 text-slate-300">
+                                ${m.specs ? m.specs.map(s => `<li>${s}</li>`).join('') : '<li>N/A</li>'}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-mono text-slate-400 font-bold uppercase mb-1">Software Logic</h4>
+                            <p class="text-slate-300 font-mono bg-cardBg p-2.5 rounded border border-cardBorder">${m.software || 'N/A'}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            renderSeasonTimeline();
+
+            // Navigation bar buttons
+            document.getElementById('navLogoBtn').addEventListener('click', () => switchView('home'));
+            document.getElementById('navHomeBtn').addEventListener('click', () => switchView('home'));
+            document.getElementById('navVaultBtn').addEventListener('click', () => switchView('vault'));
+            document.getElementById('homeExploreVaultBtn').addEventListener('click', () => switchView('vault'));
+            document.getElementById('ctaLaunchVaultBtn').addEventListener('click', () => switchView('vault'));
+
+            // Vault Archive Search input
+            const vaultSearchInput = document.getElementById('vaultSearchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+            vaultSearchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                if (clearSearchBtn) {
+                    if (searchQuery.length > 0) {
+                        clearSearchBtn.classList.remove('hidden');
+                    } else {
+                        clearSearchBtn.classList.add('hidden');
+                    }
+                }
+                if (currentView !== 'vault') {
+                    switchView('vault');
+                } else {
+                    filterAndRenderGrid();
+                }
+            });
+
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', () => {
+                    vaultSearchInput.value = '';
+                    searchQuery = '';
+                    clearSearchBtn.classList.add('hidden');
+                    filterAndRenderGrid();
+                });
+            }
+
+            // Category filter pills
+            document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(p => {
+                        p.className = 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500';
+                    });
+                    const cat = e.currentTarget.getAttribute('data-category');
+                    activeCategory = cat;
+                    e.currentTarget.className = 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm';
+                    filterAndRenderGrid();
+                });
+            });
+
+            // CAD Toggle
+            document.getElementById('cadOnlyToggle').addEventListener('change', (e) => {
+                showCadOnly = e.target.checked;
+                filterAndRenderGrid();
+            });
+
+            // Reset filters
+            document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+                activeSeasonKey = 'ALL';
+                activeCategory = 'ALL';
+                searchQuery = '';
+                showCadOnly = false;
+                vaultSearchInput.value = '';
+                if (clearSearchBtn) clearSearchBtn.classList.add('hidden');
+                document.getElementById('cadOnlyToggle').checked = false;
+                document.getElementById('activeSeasonBadge').innerText = 'Active: All Seasons';
+                renderSeasonTimeline();
+                document.querySelectorAll('#categoryPillGroup .cat-pill').forEach((p, idx) => {
+                    p.className = idx === 0 
+                        ? 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm'
+                        : 'cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500';
+                });
+                filterAndRenderGrid();
+            });
+
+            // Modal Tabs (Media / 3D WebGL)
+            const tabMediaBtn = document.getElementById('tabMediaBtn');
+            const tabCadBtn = document.getElementById('tabCadBtn');
+            const mediaContainer = document.getElementById('modalMediaContainer');
+            const canvas3dContainer = document.getElementById('modal3dCanvasContainer');
+
+            tabMediaBtn.addEventListener('click', () => {
+                mediaContainer.classList.remove('hidden');
+                canvas3dContainer.classList.add('hidden');
+                tabMediaBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+            });
+
+            tabCadBtn.addEventListener('click', () => {
+                mediaContainer.classList.add('hidden');
+                canvas3dContainer.classList.remove('hidden');
+                tabCadBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                tabMediaBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+                if (controls3d) controls3d.update();
+            });
+
+            // 3D Controls Reset & Wireframe
+            document.getElementById('reset3dCameraBtn').addEventListener('click', () => {
+                if (camera3d && controls3d) {
+                    camera3d.position.set(20, 18, 25);
+                    controls3d.reset();
+                }
+            });
+
+            document.getElementById('toggle3dWireframeBtn').addEventListener('click', () => {
+                isWireframe3d = !isWireframe3d;
+                if (currentModalMech) {
+                    load3dMechanismModel(currentModalMech.cad3dType || 'ELEVATOR');
+                }
+            });
+
+            // Modal Close Handlers
+            document.getElementById('closeDetailModalBtn').addEventListener('click', () => {
+                document.getElementById('detailModal').classList.add('hidden');
+                document.getElementById('modalMediaContainer').innerHTML = '';
+            });
+
+            document.getElementById('modalBookmarkToggleBtn').addEventListener('click', () => {
+                if (currentModalMech) {
+                    toggleBookmark(currentModalMech.id);
+                }
+            });
+
+            document.getElementById('modalCopyLinkBtn').addEventListener('click', () => {
+                if (currentModalMech) {
+                    const url = currentModalMech.mediaUrl || window.location.href;
+                    navigator.clipboard.writeText(url).then(() => {
+                        const btn = document.getElementById('modalCopyLinkBtn');
+                        const originalHtml = btn.innerHTML;
+                        btn.innerHTML = `<i class="fa-solid fa-check text-accentEmerald"></i> Link Copied!`;
+                        setTimeout(() => btn.innerHTML = originalHtml, 2000);
+                    });
+                }
+            });
+
+            // Comparison Modal Handlers
+            document.getElementById('openCompareModalBtn').addEventListener('click', openCompareModal);
+            document.getElementById('closeCompareModalBtn').addEventListener('click', () => {
+                document.getElementById('compareModal').classList.add('hidden');
+            });
+
+            // Submit Modal
+            const submitModal = document.getElementById('submitModal');
+            document.getElementById('openSubmitModalBtn').addEventListener('click', () => submitModal.classList.remove('hidden'));
+            document.getElementById('closeSubmitModalBtn').addEventListener('click', () => submitModal.classList.add('hidden'));
+
+            document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const mediaUrlVal = document.getElementById('subVideoUrl').value;
+                const ytMatch = mediaUrlVal.match(/(?:v=|\/)([\w-]{11})/);
+
+                const newMech = {
+                    id: 'mech-custom-' + Date.now(),
+                    team: document.getElementById('subTeam').value,
+                    season: document.getElementById('subSeason').value,
+                    seasonKey: document.getElementById('subSeason').value.match(/\((.*?)\)/)?.[1] || '2026-2027',
+                    title: document.getElementById('subTitle').value,
+                    category: document.getElementById('subCategory').value,
+                    cad3dType: document.getElementById('subCad3dType').value,
+                    mediaUrl: mediaUrlVal,
+                    youtubeId: ytMatch ? ytMatch[1] : '',
+                    hasCad: !!document.getElementById('subCadUrl').value,
+                    cadUrl: document.getElementById('subCadUrl').value || 'https://cad.onshape.com',
+                    specs: document.getElementById('subHardware').value ? document.getElementById('subHardware').value.split(',').map(s => s.trim()) : [],
+                    software: document.getElementById('subSoftware').value || 'User submitted FTC subsystem architecture.'
+                };
+
+                if (isFirebaseConnected && db) {
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mechanisms', newMech.id), newMech);
+                    } catch (err) {
+                        console.error("Firestore submission error:", err);
+                    }
+                } else {
+                    mechanismsData.unshift(newMech);
+                    localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
+                    filterAndRenderGrid();
+                }
+
+                submitModal.classList.add('hidden');
+                document.getElementById('submissionForm').reset();
+                switchView('vault');
+            });
+
+            // Bookmarks Drawer
+            const bookmarksDrawer = document.getElementById('bookmarksDrawer');
+            document.getElementById('openBookmarksDrawerBtn').addEventListener('click', () => {
+                bookmarksDrawer.classList.remove('translate-x-full');
+            });
+            document.getElementById('closeBookmarksDrawerBtn').addEventListener('click', () => {
+                bookmarksDrawer.classList.add('translate-x-full');
+            });
+        });
+    </script>
+</body>
+</html>
