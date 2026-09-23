@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTC Mechanism Vault & Historical Archive | CAD & Video Repository</title>
+    <title>FTC Mechanism Vault &amp; Historical Archive | CAD &amp; Video Repository</title>
+    <meta name="description" content="An open engineering archive of FIRST Tech Challenge mechanisms — 3D CAD assemblies, video reveals, bills of materials and control logic, indexed by season and subsystem.">
+    <meta name="theme-color" content="#08090C">
 
     <link rel="icon" type="image/png" href="FTCMechanismVault.png">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -15,32 +17,43 @@
             theme: {
                 extend: {
                     colors: {
-                        pitch: '#020617',
-                        obsidian: '#070d19',
-                        cyberSlate: '#0f172a',
-                        cardBg: '#0f172a',
-                        cardBorder: '#1e293b',
-                        accentBlue: '#2563EB',
-                        accentBlueHover: '#1D4ED8',
-                        accentCyan: '#06B6D4',
-                        accentDarkBlue: '#1E3A8A',
-                        accentAmber: '#F59E0B',
-                        accentEmerald: '#10B981',
-                        accentIndigo: '#6366F1'
+                        /* Surfaces */
+                        void: '#08090C',
+                        panel: '#101217',
+                        panel2: '#161920',
+                        line: '#24282F',
+                        lineSoft: '#1A1D23',
+                        /* Ink */
+                        ink: '#F2F4F7',
+                        ink2: '#AAB2BE',
+                        ink3: '#767E8B',
+                        /* Signal */
+                        signal: '#FF7A2F',
+                        signalHover: '#FF9354',
+                        signalDeep: '#B24E17',
+                        teal: '#2DD4BF',
+                        amber: '#FBBF24',
+                        rose: '#FB7185',
+                        violet: '#A78BFA',
+                        emerald: '#34D399'
                     },
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace']
+                        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+                        display: ['"Space Grotesk"', '"IBM Plex Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+                    },
+                    borderRadius: {
+                        DEFAULT: '4px', sm: '3px', md: '5px', lg: '6px', xl: '8px', '2xl': '10px', '3xl': '14px'
                     }
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts, FontAwesome & Three.js for 3D CAD Rendering -->
+    <!-- Fonts, icons & Three.js for WebGL CAD rendering -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -49,102 +62,512 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
 
     <style>
+        :root {
+            --void: #08090C;
+            --panel: #101217;
+            --panel-2: #161920;
+            --line: #24282F;
+            --line-soft: #1A1D23;
+            --ink: #F2F4F7;
+            --ink-2: #AAB2BE;
+            --ink-3: #767E8B;
+            --signal: #FF7A2F;
+            --signal-hover: #FF9354;
+            --teal: #2DD4BF;
+            --amber: #FBBF24;
+
+            --space-1: 8px;  --space-2: 12px; --space-3: 16px;
+            --space-4: 24px; --space-5: 32px; --space-6: 48px; --space-7: 64px;
+
+            --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+
+            --r-sm: 3px; --r-md: 5px; --r-lg: 8px;
+            --dur-fast: 120ms; --dur: 200ms; --dur-slow: 320ms;
+            --ease: cubic-bezier(.2,.7,.3,1);
+        }
+
+        * { border-color: var(--line); }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-            background-color: #020617 !important;
-            color: #F8FAFC;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            background-color: var(--void);
+            color: var(--ink);
+            font-size: 16px;
+            line-height: 1.55;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
         }
-        .bg-blue-ambient {
-            background-color: #020617;
-            background-image: radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.08) 0%, rgba(2, 6, 23, 1) 60%),
-                        radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.05) 0%, rgba(2, 6, 23, 1) 70%);
+
+        /* ---------- Blueprint field ---------- */
+        .blueprint {
+            position: relative;
+            background-color: var(--void);
+            background-image:
+                linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+            background-size: 34px 34px;
         }
-        .glow-blue {
-            box-shadow: 0 0 30px rgba(37, 99, 235, 0.35);
+        .blueprint::before {
+            content: '';
+            position: absolute; inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(900px 420px at 88% -8%, rgba(255,122,47,.10), transparent 65%),
+                radial-gradient(760px 420px at 4% 108%, rgba(45,212,191,.06), transparent 62%);
         }
-        .glow-blue-sm {
-            box-shadow: 0 0 15px rgba(37, 99, 235, 0.25);
+        .blueprint > * { position: relative; }
+
+        /* ---------- Corner tick frame ---------- */
+        .frame { position: relative; }
+        .frame::before, .frame::after {
+            content: '';
+            position: absolute;
+            width: 10px; height: 10px;
+            border: 1px solid var(--signal);
+            opacity: .55;
+            pointer-events: none;
+            transition: opacity var(--dur) var(--ease);
         }
-        .text-glow-blue {
-            text-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+        .frame::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+        .frame::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+        .frame:hover::before, .frame:hover::after { opacity: 1; }
+
+        /* ---------- Typography ----------
+           Space Grotesk carries all headings: its drafting-square shapes and open
+           counters hold up at display size where Plex went soft. Plex stays on body
+           copy, where Grotesk's quirks would tire the eye. */
+        h1, h2, h3, h4, .display, .h2, .h3 { font-family: var(--font-display); }
+
+        .display {
+            font-weight: 700;
+            letter-spacing: -.028em;
+            line-height: 1.04;
+            font-size: clamp(2.35rem, 5.6vw, 4.15rem);
+            text-wrap: balance;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        .h2 {
+            font-weight: 600;
+            letter-spacing: -.02em;
+            line-height: 1.14;
+            font-size: clamp(1.4rem, 2.6vw, 1.95rem);
         }
-        ::-webkit-scrollbar-track {
-            background: #020617;
+        .h3 { font-weight: 600; letter-spacing: -.01em; font-size: 1rem; line-height: 1.3; }
+        .lede { color: var(--ink-2); font-size: clamp(.95rem, 1.2vw, 1.05rem); line-height: 1.65; }
+
+        /* Reserved for section markers only — overusing this flattens the hierarchy */
+        .mono-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
+        .mono-label--signal { color: var(--signal); }
+
+        .rule {
+            display: flex; align-items: center; gap: 14px;
+            color: var(--ink-3);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #2563EB;
+        .rule::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, var(--line), transparent);
         }
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+
+        .index-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px; font-weight: 700;
+            color: var(--signal);
+            letter-spacing: .1em;
+        }
+
+        .num {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -.02em;
+        }
+
+        /* ---------- Focus ---------- */
+        :focus { outline: none; }
+        :focus-visible {
+            outline: 2px solid var(--signal);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        /* ---------- Buttons ---------- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 13px; font-weight: 600; letter-spacing: -.005em;
+            padding: 10px 16px;
+            border-radius: var(--r-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            min-height: 44px;
+            transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+                        color var(--dur) var(--ease), transform var(--dur-fast) var(--ease);
+            white-space: nowrap;
+        }
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary { background: var(--signal); color: #0B0C0E; border-color: var(--signal); font-weight: 700; }
+        .btn-primary:hover { background: var(--signal-hover); border-color: var(--signal-hover); }
+
+        .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+        .btn-ghost:hover { border-color: var(--ink-3); background: var(--panel); }
+
+        .btn-quiet { background: var(--panel); color: var(--ink-2); border-color: var(--line); }
+        .btn-quiet:hover { color: var(--ink); border-color: var(--ink-3); }
+
+        .btn-sm { min-height: 36px; padding: 7px 12px; font-size: 12px; }
+
+        .btn-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--line);
+            background: var(--panel);
+            color: var(--ink-2);
+            cursor: pointer;
+            transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+        }
+        .btn-icon:hover { color: var(--ink); border-color: var(--ink-3); }
+
+        /* ---------- Nav tabs ---------- */
+        .navtab {
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+            color: var(--ink-3);
+            padding: 10px 4px;
+            background: none; border: 0; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            min-height: 44px;
+            transition: color var(--dur) var(--ease);
+        }
+        .navtab::after {
+            content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+            height: 2px; background: var(--signal);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform var(--dur) var(--ease);
+        }
+        .navtab:hover { color: var(--ink); }
+        .navtab.is-active { color: var(--ink); }
+        .navtab.is-active::after { transform: scaleX(1); }
+
+        /* ---------- Pills (category & season) ---------- */
+        .pill {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-size: 13px; font-weight: 500; letter-spacing: 0;
+            padding: 7px 12px;
+            min-height: 34px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--ink-2);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+        }
+        .pill:hover { color: var(--ink); background: var(--panel-2); }
+        .pill.is-active {
+            background: var(--signal); border-color: var(--signal);
+            color: #0B0C0E; font-weight: 600;
+        }
+        /* Filter chips are small on a mouse, full touch targets on a finger */
+        @media (pointer: coarse) { .pill { min-height: 44px; padding: 10px 14px; } }
+
+        /* ---------- Filters ----------
+           Subsystem is a segmented control; season is a tab rail. Two different
+           shapes for two different filters, so they stop reading as one duplicated row. */
+        .segmented {
+            display: inline-flex; flex-wrap: wrap; align-items: center;
+            gap: 2px;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: var(--panel);
+        }
+
+        .season-rail { border-bottom: 1px solid var(--line); }
+        .season-tabs {
+            display: flex; align-items: center; gap: 24px;
+            overflow-x: auto;
+            -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+        }
+        .season-tab {
+            position: relative;
+            flex: 0 0 auto;
+            padding: 9px 1px 11px;
+            font-size: 13px; font-weight: 500;
+            color: var(--ink-3);
+            background: none; border: 0; cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 7px;
+            transition: color var(--dur) var(--ease);
+        }
+        .season-tab::after {
+            content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
+            height: 2px; background: var(--signal);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform var(--dur) var(--ease);
+        }
+        .season-tab:hover { color: var(--ink); }
+        .season-tab.is-active { color: var(--ink); font-weight: 600; }
+        .season-tab.is-active::after { transform: scaleX(1); }
+        @media (pointer: coarse) { .season-tab { padding-top: 13px; padding-bottom: 15px; } }
+
+        /* Inline separator between meta values */
+        .sep { color: #39404A; }
+
+        /* ---------- Fields ---------- */
+        .field {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            color: var(--ink);
+            font-size: 14px;
+            padding: 11px 13px;
+            min-height: 44px;
+            transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+        }
+        .field::placeholder { color: var(--ink-3); }
+        .field:hover { border-color: #313741; }
+        .field:focus { border-color: var(--signal); background: var(--panel-2); }
+        select.field { cursor: pointer; }
+
+        .field-label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+            color: var(--ink-3);
+            margin-bottom: 6px;
+        }
+
+        /* ---------- Panels / cards ---------- */
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+        }
+
+        .card {
+            position: relative;
+            display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
             overflow: hidden;
+            transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
         }
-        .fan-card-1 {
-            transform: rotate(-8deg) translateY(12px) translateX(-20px);
+        .card:hover { border-color: rgba(255,122,47,.55); transform: translateY(-3px); background: var(--panel-2); }
+        .card:focus-within { border-color: rgba(255,122,47,.55); }
+
+        .card__media { position: relative; aspect-ratio: 16/10; background: #0B0C10; overflow: hidden; cursor: pointer; }
+        /* Thumbnails come from a dozen different channels and clash violently at grid
+           scale. Knocking back saturation and brightness lets the grid read as one
+           surface; hover restores the real image. */
+        .card__media img, .card__media canvas {
+            width: 100%; height: 100%; object-fit: cover;
+            transform: scale(1.01);
+            transition: filter var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
         }
-        .fan-card-2 {
-            transform: rotate(0deg) translateY(-8px);
-            z-index: 10;
+        /* Only photography needs knocking back — CAD renders are already on-palette */
+        .card__media img { filter: saturate(.7) brightness(.82) contrast(1.02); }
+        .card:hover .card__media img { filter: none; }
+        .card:hover .card__media img, .card:hover .card__media canvas { transform: scale(1.04); }
+        .card__media::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(180deg, rgba(8,9,12,.45) 0%, transparent 38%, rgba(8,9,12,.55) 100%);
         }
-        .fan-card-3 {
-            transform: rotate(8deg) translateY(18px) translateX(20px);
+        .card__scan {
+            position: absolute; inset: 0; pointer-events: none; z-index: 1;
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px);
+            opacity: 0; transition: opacity var(--dur) var(--ease);
+        }
+        .card:hover .card__scan { opacity: 1; }
+
+        /* Play / CAD marker sits in the corner — a bullseye on every tile reads as noise */
+        .card__marker {
+            position: absolute; bottom: 10px; right: 10px; z-index: 3;
+            width: 30px; height: 30px; border-radius: var(--r-md);
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(8,9,12,.72); border: 1px solid rgba(255,255,255,.14);
+            backdrop-filter: blur(6px);
+            color: var(--ink); font-size: 11px;
+            transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+        }
+        .card:hover .card__marker { background: var(--signal); border-color: var(--signal); color: #0B0C0E; }
+
+        .card__title {
+            font-family: var(--font-display);
+            font-size: 14px; font-weight: 600; letter-spacing: -.01em; line-height: 1.32;
+            color: var(--ink);
+            /* Two-line box keeps every card's footer on the same baseline */
+            min-height: 2.64em;
+            transition: color var(--dur) var(--ease);
+        }
+        .card:hover .card__title { color: var(--signal); }
+
+        .card__foot {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            padding: 7px 8px 7px 14px;
+            border-top: 1px solid var(--line-soft);
+            background: rgba(8,9,12,.35);
+        }
+
+        .card-act {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px;
+            border: 0; border-radius: var(--r-md);
+            background: transparent; color: var(--ink-3);
+            font-size: 11px; cursor: pointer;
+            transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+        }
+        .card-act:hover { color: var(--ink); background: var(--panel-2); }
+        .card-act.is-on { color: #0B0C0E; background: var(--signal); }
+        .card-act.is-saved { color: var(--amber); }
+        @media (pointer: coarse) { .card-act { width: 40px; height: 40px; } }
+
+        .tag {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 11px; font-weight: 500; letter-spacing: 0;
+            padding: 3px 8px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--line);
+            background: rgba(8,9,12,.8);
+            backdrop-filter: blur(6px);
+            color: var(--ink-2);
+        }
+        .tag--signal { color: #0B0C0E; background: var(--signal); border-color: var(--signal); font-weight: 700; }
+        .tag--teal { color: var(--teal); border-color: rgba(45,212,191,.42); background: rgba(45,212,191,.10); }
+        .tag--amber { color: var(--amber); border-color: rgba(251,191,36,.42); background: rgba(251,191,36,.10); }
+
+        .live-dot {
+            display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+            background: var(--teal);
+            animation: pulse-dot 2.4s var(--ease) infinite;
+        }
+        @keyframes pulse-dot {
+            0%   { box-shadow: 0 0 0 0 rgba(45,212,191,.5); }
+            70%  { box-shadow: 0 0 0 7px rgba(45,212,191,0); }
+            100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+        }
+
+        /* ---------- Modal shell ---------- */
+        .modal-backdrop { background: rgba(6,7,9,.86); backdrop-filter: blur(8px); }
+        .modal-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            box-shadow: 0 32px 80px -24px rgba(0,0,0,.85);
+            animation: modal-in var(--dur-slow) var(--ease);
+        }
+        @keyframes modal-in { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: none; } }
+
+        /* ---------- Card entrance ---------- */
+        @keyframes card-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        .card-enter { animation: card-in 380ms var(--ease) both; }
+
+        /* ---------- Misc ---------- */
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .scrollbar-none { scrollbar-width: none; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+
+        ::selection { background: var(--signal); color: #0B0C0E; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--void); }
+        ::-webkit-scrollbar-thumb { background: #262B33; border: 2px solid var(--void); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--signal); }
+
+        .kbd {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px; font-weight: 600;
+            padding: 3px 6px;
+            border: 1px solid var(--line);
+            border-bottom-width: 2px;
+            border-radius: var(--r-sm);
+            color: var(--ink-3);
+            background: var(--panel-2);
+        }
+
+        .skip-link {
+            position: absolute; left: 12px; top: -60px; z-index: 100;
+            background: var(--signal); color: #0B0C0E;
+            padding: 10px 16px; border-radius: var(--r-md);
+            font-weight: 700; font-size: 13px;
+            transition: top var(--dur) var(--ease);
+        }
+        .skip-link:focus { top: 12px; }
+
+        /* Hero spec card */
+        .spec-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            box-shadow: 0 24px 60px -28px rgba(0,0,0,.9);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: .001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .001ms !important;
+            }
+            .card:hover { transform: none; }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-pitch text-slate-100 antialiased selection:bg-accentBlue selection:text-white">
+<body class="min-h-screen flex flex-col bg-void text-ink antialiased">
 
-    <header class="sticky top-0 z-40 bg-pitch/95 backdrop-blur-md border-b border-cardBorder">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            
-            <!-- Brand Logo -->
-            <button id="navLogoBtn" class="flex items-center gap-3 text-left focus:outline-none group shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-accentDarkBlue via-accentBlue to-cyan-400 flex items-center justify-center text-white font-black shadow-lg glow-blue-sm group-hover:scale-105 transition-transform">
-                    <i class="fa-solid fa-cubes text-lg"></i>
-                </div>
-                <div class="flex items-center text-xl sm:text-2xl font-black tracking-tight">
-                    <span class="text-white">FTC Mechanism</span>
-                    <span class="text-accentBlue text-glow-blue ml-1.5">Vault</span>
-                </div>
+    <a href="#mainContent" class="skip-link">Skip to content</a>
+
+    <!-- ══════════════════════ HEADER ══════════════════════ -->
+    <header class="sticky top-0 z-40 bg-void/92 backdrop-blur-xl border-b border-line">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-x-4 py-2 md:py-0 md:h-16 md:flex-nowrap">
+
+            <!-- Wordmark -->
+            <button id="navLogoBtn" type="button" class="order-1 flex items-center gap-3 text-left group shrink-0 min-h-[44px]" aria-label="FTC Mechanism Vault — go to home">
+                <span class="w-9 h-9 rounded-[5px] border border-signal/45 bg-signal/10 flex items-center justify-center text-signal group-hover:bg-signal group-hover:text-void transition-colors">
+                    <i class="fa-solid fa-cubes text-[15px]" aria-hidden="true"></i>
+                </span>
+                <span class="leading-none">
+                    <span class="block text-[15px] font-semibold tracking-[-.02em] text-ink">Mechanism<span class="text-signal">Vault</span></span>
+                    <span class="hidden sm:block mono-label text-[9px] tracking-[.18em] mt-1">FTC Engineering Archive</span>
+                </span>
             </button>
 
-            <!-- Header Navigation Links & Action Buttons -->
-            <div class="flex items-center gap-2 sm:gap-4 font-semibold text-xs sm:text-sm ml-auto">
-                <nav class="flex items-center gap-1 sm:gap-2 mr-2">
-                    <button id="navHomeBtn" class="px-3 py-2 rounded-lg text-white hover:text-accentBlue transition-colors font-bold flex items-center gap-1.5 border-b-2 border-accentBlue">
-                        <span>Home</span>
-                    </button>
-                    <button id="navVaultBtn" class="px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold flex items-center gap-1.5 border-b-2 border-transparent">
-                        <span>Vault Archive</span>
-                    </button>
-                    <button id="openCompareModalBtn" class="px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold hidden sm:flex items-center gap-1.5">
-                        <span>Compare</span>
-                        <span id="compareCountBadge" class="px-1.5 py-0.2 bg-accentBlue text-white text-[10px] font-extrabold rounded-full hidden">0</span>
-                    </button>
-                </nav>
+            <span class="order-2 hidden lg:block h-6 w-px bg-line mx-2" aria-hidden="true"></span>
 
-                <!-- Bookmarks Drawer Button -->
-                <button id="openBookmarksDrawerBtn" class="p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl bg-cardBg border border-cardBorder hover:border-accentAmber/60 text-slate-300 hover:text-white transition-all flex items-center gap-2" title="Bookmarks">
-                    <i class="fa-solid fa-bookmark text-accentAmber text-sm"></i>
-                    <span class="hidden lg:inline text-xs font-bold">Saved</span>
-                    <span id="bookmarkCountBadge" class="px-1.5 py-0.2 bg-accentBlue text-white text-[10px] font-extrabold rounded-full hidden">0</span>
+            <!-- Primary nav — wraps to its own row below the logo on small screens -->
+            <nav class="order-3 md:order-2 w-full md:w-auto flex items-center gap-6 overflow-x-auto scrollbar-none border-t border-line md:border-0 pt-1 md:pt-0" aria-label="Primary">
+                <button id="navHomeBtn" type="button" class="navtab is-active">Overview</button>
+                <button id="navVaultBtn" type="button" class="navtab">Vault Archive</button>
+                <button id="openCompareModalBtn" type="button" class="navtab">
+                    <span>Compare</span>
+                    <span id="compareCountBadge" class="hidden num text-[10px] px-1.5 py-px rounded-[3px] bg-signal text-void">0</span>
+                </button>
+            </nav>
+
+            <div class="order-2 md:order-3 flex items-center gap-2 ml-auto">
+                <button id="openBookmarksDrawerBtn" type="button" class="btn btn-quiet btn-sm gap-2" aria-label="Open saved mechanisms">
+                    <i class="fa-solid fa-bookmark text-amber text-[12px]" aria-hidden="true"></i>
+                    <span class="hidden lg:inline">Saved</span>
+                    <span id="bookmarkCountBadge" class="hidden num text-[10px] px-1.5 py-px rounded-[3px] bg-amber text-void">0</span>
                 </button>
 
-                <!-- Submit Mechanism Action Button -->
-                <button id="openSubmitModalBtn" class="px-4 py-2.5 rounded-xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg glow-blue-sm transition-all transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-plus-circle"></i>
-                    <span>Submit Mechanism</span>
+                <button id="openSubmitModalBtn" type="button" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus text-[11px]" aria-hidden="true"></i>
+                    <span class="hidden sm:inline">Submit Mechanism</span>
+                    <span class="sm:hidden">Submit</span>
                 </button>
             </div>
         </div>
@@ -152,486 +575,412 @@
 
     <div id="appContainer" class="flex-1 flex flex-col">
 
-        <!-- HOME PAGE VIEW -->
-        <section id="homeView" class="flex-1 flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-16">
-            
-            <!-- Hero Brand Section -->
-            <div class="space-y-6 pt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-accentDarkBlue via-accentBlue to-cyan-400 flex items-center justify-center text-white text-2xl font-black shadow-xl glow-blue">
-                        <i class="fa-solid fa-cubes"></i>
+        <!-- ══════════════════════ HOME / OVERVIEW ══════════════════════ -->
+        <section id="homeView" class="flex-1 blueprint" aria-labelledby="heroHeading">
+            <div id="mainContent" class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- ── Hero ── -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-16 pb-20 lg:pt-24 lg:pb-28">
+
+                    <div class="lg:col-span-7 space-y-7">
+                        <div class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-[4px] border border-signal/35 bg-signal/8">
+                            <span class="live-dot" style="background:#FF7A2F" aria-hidden="true"></span>
+                            <span class="mono-label mono-label--signal text-[10px]">Open Archive · 8 Seasons Indexed</span>
+                        </div>
+
+                        <h1 id="heroHeading" class="display text-ink">
+                            Every FTC mechanism,<br>
+                            <span class="text-signal">documented</span> like a spec&nbsp;sheet.
+                        </h1>
+
+                        <p class="lede max-w-xl">
+                            MechanismVault is a multi-format engineering reference for FIRST Tech Challenge teams:
+                            interactive 3D CAD assemblies, video reveals, bills of materials and control logic —
+                            collected, filtered and cross-compared in one place.
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button id="homeExploreVaultBtn" type="button" class="btn btn-primary">
+                                <span>Open the Vault</span>
+                                <i class="fa-solid fa-arrow-right text-[11px]" aria-hidden="true"></i>
+                            </button>
+                            <a href="#formats" class="btn btn-ghost">
+                                <span>What's inside</span>
+                                <i class="fa-solid fa-arrow-down text-[11px]" aria-hidden="true"></i>
+                            </a>
+                        </div>
+
+                        <!-- Instrument strip -->
+                        <p class="border-t border-line pt-5 mt-1 text-[13px] text-ink3">
+                            <span class="num text-ink">8</span> seasons
+                            <span class="sep mx-2" aria-hidden="true">·</span>
+                            <span class="num text-ink">5</span> subsystem types
+                            <span class="sep mx-2" aria-hidden="true">·</span>
+                            <span class="num text-ink">4</span> media formats
+                        </p>
                     </div>
-                    <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight flex items-center gap-1">
-                        <span>Mechanism</span><span class="text-accentBlue text-glow-blue">Vault</span>
-                    </h1>
+
+                    <!-- Hero visual: one filled-in record, shown the way the vault shows it -->
+                    <div class="lg:col-span-5 flex justify-center lg:justify-end">
+                        <figure class="spec-card frame w-full max-w-[400px]" aria-hidden="true">
+                            <div class="relative aspect-[16/10] overflow-hidden bg-void">
+                                <img src="hero-robot.webp" alt="" width="983" height="636" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-panel via-panel/25 to-transparent"></div>
+                                <span class="tag tag--signal absolute top-3 left-3">3D CAD + Video</span>
+                            </div>
+
+                            <figcaption class="p-4 space-y-3">
+                                <div>
+                                    <p class="text-[11px] font-mono text-signal">Launcher subsystem</p>
+                                    <p class="text-[15px] font-semibold text-ink mt-1" style="font-family:var(--font-display)">Tensioned Catapult Launcher</p>
+                                    <p class="text-[12px] text-ink3 mt-1">FTC #11115 Gluten Free<span class="sep mx-1.5">·</span><span class="num">2025-2026</span></p>
+                                </div>
+
+                                <dl class="border-t border-line pt-3 space-y-1.5 text-[12px]">
+                                    <div class="flex gap-3">
+                                        <dt class="w-16 shrink-0 text-ink3">Drive</dt>
+                                        <dd class="text-ink2 truncate">goBILDA 1150 RPM Yellowjacket</dd>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <dt class="w-16 shrink-0 text-ink3">Release</dt>
+                                        <dd class="text-ink2 truncate">Axon Micro servo, 180°</dd>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <dt class="w-16 shrink-0 text-ink3">Control</dt>
+                                        <dd class="text-ink2 truncate">Velocity PIDF, auto-align</dd>
+                                    </div>
+                                </dl>
+                            </figcaption>
+                        </figure>
+                    </div>
                 </div>
 
-                <!-- Multi-Media Hero Statement -->
-                <div class="max-w-3xl space-y-4">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                        A Comprehensive Multi-Media Library for <span class="text-accentBlue">FTC Mechanism Ideas</span>
-                    </h2>
-                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
-                        MechanismVault isn't just for CAD models—it is a complete, multi-platform media repository built for FIRST Tech Challenge (FTC) robotics teams. Discover, analyze, and save high-performing subsystem ideas gathered across <strong>3D CAD designs, YouTube reveals, Instagram clips, CAD animations, and community showcases</strong>.
-                    </p>
-                    <div class="flex flex-wrap items-center gap-3 pt-1">
-                        <button id="homeExploreVaultBtn" class="px-5 py-3 rounded-xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-xs sm:text-sm shadow-lg glow-blue-sm transition-all flex items-center gap-2">
-                            <span>Explore the Mechanism Library</span>
-                            <i class="fa-solid fa-arrow-right"></i>
+                <!-- ── 01 · Formats ── -->
+                <div id="formats" class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 py-16 border-t border-line scroll-mt-20">
+                    <div class="lg:col-span-5 space-y-5">
+                        <div class="rule">
+                            <span class="index-num">01</span>
+                            <span class="mono-label">Coverage</span>
+                        </div>
+                        <h2 class="h2 text-ink">Inspiration from<br>every format teams publish</h2>
+                        <p class="lede">
+                            Clearance checks want CAD. Cycle-time questions want video. Build decisions want a BOM.
+                            The vault carries all of it against the same mechanism record, so you never lose the thread
+                            between what a subsystem looks like and how it was actually built.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line rounded-[6px] overflow-hidden">
+                        <div class="bg-panel p-5 flex items-start gap-3.5">
+                            <i class="fa-solid fa-cube text-signal text-base mt-0.5" aria-hidden="true"></i>
+                            <div>
+                                <div class="h3 text-ink">3D CAD Models</div>
+                                <p class="text-[13px] text-ink2 mt-1 leading-relaxed">Interactive WebGL assemblies and Onshape documents.</p>
+                            </div>
+                        </div>
+                        <div class="bg-panel p-5 flex items-start gap-3.5">
+                            <i class="fa-brands fa-youtube text-rose text-base mt-0.5" aria-hidden="true"></i>
+                            <div>
+                                <div class="h3 text-ink">YouTube Demos</div>
+                                <p class="text-[13px] text-ink2 mt-1 leading-relaxed">Match breakdowns and full robot reveals.</p>
+                            </div>
+                        </div>
+                        <div class="bg-panel p-5 flex items-start gap-3.5">
+                            <i class="fa-brands fa-instagram text-violet text-base mt-0.5" aria-hidden="true"></i>
+                            <div>
+                                <div class="h3 text-ink">Instagram Clips</div>
+                                <p class="text-[13px] text-ink2 mt-1 leading-relaxed">Short reels of mechanisms in motion.</p>
+                            </div>
+                        </div>
+                        <div class="bg-panel p-5 flex items-start gap-3.5">
+                            <i class="fa-solid fa-screwdriver-wrench text-amber text-base mt-0.5" aria-hidden="true"></i>
+                            <div>
+                                <div class="h3 text-ink">BOM &amp; Control Logic</div>
+                                <p class="text-[13px] text-ink2 mt-1 leading-relaxed">Hardware lists and the PIDF notes behind them.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 02 · Capabilities ── -->
+                <div class="py-16 border-t border-line space-y-10">
+                    <div class="rule">
+                        <span class="index-num">02</span>
+                        <span class="mono-label">Capabilities</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <article class="panel p-5 space-y-3 hover:border-signal/45 transition-colors">
+                            <i class="fa-solid fa-layer-group text-signal text-base" aria-hidden="true"></i>
+                            <h3 class="h3 text-ink">Multi-Media Archive</h3>
+                            <p class="text-[13px] text-ink2 leading-relaxed">One record per mechanism, linking video, CAD and documentation together.</p>
+                        </article>
+                        <article class="panel p-5 space-y-3 hover:border-signal/45 transition-colors">
+                            <i class="fa-solid fa-cube text-signal text-base" aria-hidden="true"></i>
+                            <h3 class="h3 text-ink">Interactive 3D WebGL</h3>
+                            <p class="text-[13px] text-ink2 leading-relaxed">Orbit, zoom and switch to wireframe without leaving the browser.</p>
+                        </article>
+                        <article class="panel p-5 space-y-3 hover:border-signal/45 transition-colors">
+                            <i class="fa-solid fa-code-compare text-signal text-base" aria-hidden="true"></i>
+                            <h3 class="h3 text-ink">Side-by-Side Compare</h3>
+                            <p class="text-[13px] text-ink2 leading-relaxed">Put two BOMs and two control strategies next to each other.</p>
+                        </article>
+                        <article class="panel p-5 space-y-3 hover:border-signal/45 transition-colors">
+                            <i class="fa-solid fa-users text-signal text-base" aria-hidden="true"></i>
+                            <h3 class="h3 text-ink">Community Submissions</h3>
+                            <p class="text-[13px] text-ink2 leading-relaxed">Any team can publish a subsystem with links, specs and notes.</p>
+                        </article>
+                    </div>
+                </div>
+
+                <!-- ── CTA ── -->
+                <div class="pb-20">
+                    <div class="panel p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-gradient-to-r from-signal/8 via-panel to-panel">
+                        <div class="max-w-xl">
+                            <h2 class="h2 text-ink">Ready to inspect some robots?</h2>
+                            <p class="text-[14px] text-ink2 mt-2 leading-relaxed">
+                                Spintakes, linear slides, differential wrists and catapult launchers across eight FTC seasons — filterable by subsystem, season and whether CAD is attached.
+                            </p>
+                        </div>
+                        <button id="ctaLaunchVaultBtn" type="button" class="btn btn-primary shrink-0">
+                            <i class="fa-solid fa-cubes text-[12px]" aria-hidden="true"></i>
+                            <span>Open Mechanism Vault</span>
                         </button>
                     </div>
                 </div>
+
             </div>
-
-            <!-- Multi-Platform Media Showcase Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pt-6 border-t border-cardBorder/60">
-                <div class="lg:col-span-6 space-y-4">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                        Gather Inspiration from <span class="text-accentBlue">Every Format</span>
-                    </h2>
-                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                        Whether you need interactive 3D WebGL assemblies to inspect clearances, YouTube video breakdowns of high-speed spintakes, or Instagram reveal reels of differential wrists and linear elevators, MechanismVault consolidates top FTC engineering solutions in one place.
-                    </p>
-                    
-                    <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
-                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
-                            <i class="fa-solid fa-cube text-accentBlue text-base"></i>
-                            <div>
-                                <div class="font-bold text-white">3D CAD Models</div>
-                                <div class="text-[10px] text-slate-400">Interactive WebGL & Onshape</div>
-                            </div>
-                        </div>
-                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
-                            <i class="fa-brands fa-youtube text-rose-500 text-base"></i>
-                            <div>
-                                <div class="font-bold text-white">YouTube Demos</div>
-                                <div class="text-[10px] text-slate-400">Match breakdowns & reveals</div>
-                            </div>
-                        </div>
-                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
-                            <i class="fa-brands fa-instagram text-pink-500 text-base"></i>
-                            <div>
-                                <div class="font-bold text-white">Instagram Clips</div>
-                                <div class="text-[10px] text-slate-400">Short mechanism reels</div>
-                            </div>
-                        </div>
-                        <div class="p-3 rounded-xl bg-cardBg border border-cardBorder flex items-center gap-2.5">
-                            <i class="fa-solid fa-screwdriver-wrench text-accentAmber text-base"></i>
-                            <div>
-                                <div class="font-bold text-white">BOM & PID Logic</div>
-                                <div class="text-[10px] text-slate-400">Hardware & control specs</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Visual Media Stacked Graphic -->
-                <div class="lg:col-span-6 relative flex justify-center items-center py-8">
-                    <div class="relative w-full max-w-md h-72 flex justify-center items-center">
-                        <div class="fan-card-1 absolute w-60 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-2xl space-y-2 pointer-events-none">
-                            <div class="h-28 rounded-lg bg-black/60 flex items-center justify-center border border-cardBorder relative overflow-hidden">
-                                <i class="fa-brands fa-instagram text-3xl text-pink-500"></i>
-                                <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-pink-600 text-white">INSTAGRAM REEL</span>
-                            </div>
-                            <span class="text-[10px] font-mono text-accentBlue font-bold uppercase">Spintake Concept</span>
-                            <h4 class="text-xs font-bold text-white truncate">Floating Roller Intake</h4>
-                        </div>
-
-                        <div class="fan-card-2 absolute w-64 p-4 bg-obsidian border-2 border-accentBlue/80 rounded-2xl shadow-2xl z-20 glow-blue-sm">
-                            <div class="h-32 rounded-xl bg-pitch flex items-center justify-center border border-cardBorder relative overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80" alt="3D CAD and Video Media" class="w-full h-full object-cover opacity-80">
-                                <span class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-accentBlue text-white flex items-center gap-1">
-                                    <i class="fa-solid fa-layer-group"></i> 3D CAD + VIDEO
-                                </span>
-                            </div>
-                            <span class="text-[10px] font-mono text-accentBlue font-bold uppercase">Launcher Subsystem</span>
-                            <h4 class="text-xs font-bold text-white truncate">Catapult Launcher</h4>
-                        </div>
-
-                        <div class="fan-card-3 absolute w-60 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-2xl space-y-2 pointer-events-none">
-                            <div class="h-28 rounded-lg bg-black/60 flex items-center justify-center border border-cardBorder relative overflow-hidden">
-                                <i class="fa-brands fa-youtube text-3xl text-rose-500"></i>
-                                <span class="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-rose-600 text-white">YOUTUBE REVEAL</span>
-                            </div>
-                            <span class="text-[10px] font-mono text-accentBlue font-bold uppercase">Linear Elevator</span>
-                            <h4 class="text-xs font-bold text-white truncate">Viper Slide High Lift</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Features Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-cardBorder/60">
-                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
-                        <i class="fa-solid fa-icons"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Multi-Media Archive</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Browse mechanisms via YouTube, Instagram, 3D CAD, and documentation links.</p>
-                </div>
-
-                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
-                        <i class="fa-solid fa-cube"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Interactive 3D WebGL</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Orbit, inspect, zoom, and test wireframe assemblies directly in your browser.</p>
-                </div>
-
-                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
-                        <i class="fa-solid fa-code-compare"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Side-by-Side Compare</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Compare hardware BOMs and control algorithms between two mechanisms.</p>
-                </div>
-
-                <div class="p-6 bg-cardBg border border-cardBorder rounded-2xl space-y-3 hover:border-accentBlue/50 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-lg">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-white">Community Submissions</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Submit custom team mechanisms with YouTube, Instagram, or CAD links.</p>
-                </div>
-            </div>
-
-            <!-- Call to Action Banner -->
-            <div class="p-8 rounded-3xl bg-gradient-to-r from-accentDarkBlue/40 via-cardBg to-obsidian border border-accentBlue/30 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">Ready to inspect robot mechanisms?</h3>
-                    <p class="text-xs sm:text-sm text-slate-400 mt-1">Browse active spintakes, linear slides, differential wrists, and catapult launchers across 8 FTC seasons.</p>
-                </div>
-                <button id="ctaLaunchVaultBtn" class="px-6 py-3.5 rounded-2xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-sm shadow-xl glow-blue shrink-0 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
-                    <i class="fa-solid fa-cubes text-base"></i>
-                    <span>Open Mechanism Vault</span>
-                </button>
-            </div>
-
         </section>
 
-        <!-- MAIN VAULT / ARCHIVE PAGE VIEW -->
-        <main id="vaultView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+        <!-- ══════════════════════ VAULT ARCHIVE ══════════════════════ -->
+        <main id="vaultView" class="hidden max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
 
-            <!-- Historical Season Archive Banner & Live Counters Row -->
-            <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-obsidian via-cardBg to-cyberSlate border border-cardBorder shadow-2xl space-y-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cardBorder/80 pb-5">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-accentBlue/20 text-accentBlue border border-accentBlue/40 flex items-center gap-1.5">
-                                <i class="fa-solid fa-box-archive"></i> FTC HISTORICAL ARCHIVE
-                            </span>
-                            <span id="archiveBannerSeasonBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold uppercase bg-accentAmber/20 text-accentAmber border border-accentAmber/40">
-                                ALL SEASONS
-                            </span>
-                        </div>
-                        <h2 id="archiveBannerTitle" class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                            FTC Mechanism Vault & Historical Archive
-                        </h2>
-                        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-                            Explore, filter, and inspect CAD models, video reveals, and subsystem engineering specs across 8 historical FTC game seasons.
-                        </p>
-                    </div>
+            <!-- Page heading + search -->
+            <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+                <div class="flex items-baseline gap-3 min-w-0 shrink-0">
+                    <h1 id="archiveBannerTitle" class="text-[19px] font-semibold tracking-[-.02em] text-ink truncate">
+                        Mechanism Archive
+                    </h1>
+                    <span id="archiveBannerSeasonBadge" class="text-[12px] text-ink3 whitespace-nowrap">All Seasons</span>
                 </div>
 
-                <!-- Stats Counters Grid -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5 relative overflow-hidden group hover:border-accentBlue/40 transition-all">
-                        <div class="w-11 h-11 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue text-xl shrink-0 glow-blue-sm">
-                            <i class="fa-solid fa-cubes animate-pulse"></i>
-                        </div>
-                        <div>
-                            <div id="statTotalMechs" class="text-xl sm:text-2xl font-black text-white font-mono flex items-center gap-1.5">
-                                <span>0</span>
-                                <span class="flex h-2 w-2 relative">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accentBlue opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-accentBlue"></span>
-                                </span>
-                            </div>
-                            <div class="text-[11px] font-bold text-slate-400">Total Mechanisms</div>
-                        </div>
-                    </div>
-
-                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5 relative overflow-hidden group hover:border-cyan-500/40 transition-all">
-                        <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl shrink-0 glow-blue-sm">
-                            <i class="fa-solid fa-cube animate-pulse"></i>
-                        </div>
-                        <div>
-                            <div id="statCadModels" class="text-xl sm:text-2xl font-black text-white font-mono flex items-center gap-1.5">
-                                <span>0</span>
-                                <span class="flex h-2 w-2 relative">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                                </span>
-                            </div>
-                            <div class="text-[11px] font-bold text-slate-400">3D CAD Assemblies</div>
-                        </div>
-                    </div>
-
-                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5 relative overflow-hidden group hover:border-rose-500/40 transition-all">
-                        <div class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-xl shrink-0 glow-blue-sm">
-                            <i class="fa-brands fa-youtube animate-pulse"></i>
-                        </div>
-                        <div>
-                            <div id="statVideoReveals" class="text-xl sm:text-2xl font-black text-white font-mono flex items-center gap-1.5">
-                                <span>0</span>
-                                <span class="flex h-2 w-2 relative">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                                </span>
-                            </div>
-                            <div class="text-[11px] font-bold text-slate-400">Video Reveals & Clips</div>
-                        </div>
-                    </div>
-
-                    <!-- Live Firebase Website Views Visual Stat Block -->
-                    <div class="p-4 rounded-2xl bg-pitch/80 border border-cardBorder flex items-center gap-3.5 relative overflow-hidden group hover:border-emerald-500/40 transition-all">
-                        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl shrink-0 glow-blue-sm">
-                            <i class="fa-solid fa-eye animate-pulse"></i>
-                        </div>
-                        <div>
-                            <div id="statWebsiteViews" class="text-xl sm:text-2xl font-black text-white font-mono flex items-center gap-1.5">
-                                <span>0</span>
-                                <span class="flex h-2 w-2 relative">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                            </div>
-                            <div class="text-[11px] font-bold text-slate-400 flex items-center gap-1">
-                                <span>Total Website Views</span>
-                                <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/30">LIVE</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="relative w-full lg:ml-auto lg:max-w-md">
+                    <label for="vaultSearchInput" class="sr-only">Search the mechanism vault</label>
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink3" aria-hidden="true">
+                        <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
+                    </span>
+                    <input type="search" id="vaultSearchInput"
+                           placeholder="Search team, mechanism or hardware…"
+                           class="field pl-10 pr-20 text-[14px]">
+                    <span class="absolute inset-y-0 right-10 hidden sm:flex items-center pointer-events-none">
+                        <span class="kbd">/</span>
+                    </span>
+                    <button id="clearSearchBtn" type="button" class="absolute inset-y-0 right-0 pr-3.5 hidden items-center text-ink3 hover:text-ink transition-colors" aria-label="Clear search">
+                        <i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- Prominent Search Bar for Vault Archive -->
-            <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none text-slate-400 text-base sm:text-lg">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <input type="text" id="vaultSearchInput" placeholder="Search by team # (e.g. #11115), mechanism name, hardware BOM, or season..." 
-                       class="w-full pl-12 sm:pl-14 pr-12 py-3.5 sm:py-4 bg-cyberSlate border-2 border-cardBorder focus:border-accentBlue focus:ring-4 focus:ring-accentBlue/20 focus:outline-none rounded-2xl text-sm sm:text-base text-slate-100 placeholder:text-slate-500 shadow-xl transition-all">
-                <button id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-300 hidden transition-colors" title="Clear Search">
-                    <i class="fa-solid fa-circle-xmark text-lg"></i>
-                </button>
-            </div>
+            <!-- Filters -->
+            <div class="space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                    <div class="segmented" id="categoryPillGroup" role="group" aria-label="Filter by subsystem">
+                        <button type="button" data-category="ALL" class="cat-pill pill is-active">All</button>
+                        <button type="button" data-category="Intake" class="cat-pill pill">Intakes</button>
+                        <button type="button" data-category="Outtake &amp; Lift" class="cat-pill pill">Outtakes &amp; lifts</button>
+                        <button type="button" data-category="Shooter / Launcher" class="cat-pill pill">Launchers</button>
+                        <button type="button" data-category="Transfer" class="cat-pill pill">Transfers</button>
+                        <button type="button" data-category="Full Robot" class="cat-pill pill">Robot reveals</button>
+                    </div>
 
-            <!-- Season Selector Bar with Thematic Game Symbols -->
-            <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-filter text-accentBlue"></i> Filter Game Season
-                    </h2>
-                    <span id="activeSeasonBadge" class="text-xs text-accentBlue font-mono font-semibold">Active: All Seasons</span>
-                </div>
-                
-                <div class="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x" id="seasonTimelineContainer"></div>
-            </div>
-
-            <!-- Subsystem Category Pills & Options Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
-                <div class="flex flex-wrap items-center gap-2" id="categoryPillGroup">
-                    <button data-category="ALL" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm">
-                        <i class="fa-solid fa-layer-group mr-1.5"></i> All Subsystems
-                    </button>
-                    <button data-category="Intake" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
-                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 mr-1.5"></i> Intakes
-                    </button>
-                    <button data-category="Outtake & Lift" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
-                        <i class="fa-solid fa-arrow-up-from-bracket text-amber-400 mr-1.5"></i> Outtakes & Lifts
-                    </button>
-
-                    <button data-category="Shooter / Launcher" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
-                        <svg class="inline-block w-4 h-4 mr-1.5 align-middle text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 19h18" />
-                            <path d="M5 19l4-8" />
-                            <path d="M12 19l-3-8" />
-                            <path d="M9 11l9-5" />
-                            <circle cx="18" cy="6" r="2" />
-                        </svg>
-                        Launchers
-                    </button>
-
-                    <button data-category="Transfer" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
-                        <i class="fa-solid fa-arrows-rotate text-purple-400 mr-1.5"></i> Transfers
-                    </button>
-                    <button data-category="Full Robot" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500">
-                        <i class="fa-solid fa-robot text-cyan-400 mr-1.5"></i> Robot Reveals
-                    </button>
-                </div>
-
-                <!-- CAD Toggle & Counter -->
-                <div class="flex items-center gap-4 text-xs font-mono">
-                    <label class="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
-                        <input type="checkbox" id="cadOnlyToggle" class="rounded bg-pitch border-cardBorder text-accentBlue focus:ring-accentBlue">
-                        <span><i class="fa-solid fa-cube text-accentBlue"></i> 3D CAD Models Only</span>
-                    </label>
-                    <div class="text-slate-400">
-                        Matching: <span id="resultsCount" class="text-accentBlue font-bold">0</span>
+                    <div class="flex items-center gap-5">
+                        <label for="cadOnlyToggle" class="flex items-center gap-2 cursor-pointer text-[13px] text-ink2 hover:text-ink transition-colors">
+                            <input type="checkbox" id="cadOnlyToggle" class="w-4 h-4 rounded-[3px] bg-panel border border-line accent-signal cursor-pointer">
+                            <span>3D CAD only</span>
+                        </label>
+                        <p class="text-[13px] text-ink3"><span id="resultsCount" class="num text-ink">0</span> results</p>
                     </div>
                 </div>
+
+                <div class="season-rail">
+                    <div class="season-tabs scrollbar-none" id="seasonTimelineContainer" role="group" aria-label="Filter by season"></div>
+                </div>
+
+                <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink3">
+                    <span><span id="statTotalMechs" class="num text-ink2">0</span> total</span>
+                    <span class="sep" aria-hidden="true">·</span>
+                    <span><span id="statVideoReveals" class="num text-ink2">0</span> video</span>
+                    <span class="sep" aria-hidden="true">·</span>
+                    <span><span id="statCadModels" class="num text-ink2">0</span> with CAD</span>
+                    <span class="sep" aria-hidden="true">·</span>
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="live-dot" aria-hidden="true"></span><span id="statWebsiteViews" class="num text-ink2">0</span> views
+                    </span>
+                </p>
             </div>
 
-            <!-- Grid Container -->
-            <section>
-                <div id="mechanismGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <span id="activeSeasonBadge" class="sr-only">Active: All Seasons</span>
 
-                <!-- Empty Results Placeholder -->
-                <div id="emptyState" class="hidden text-center py-16 bg-cardBg border border-dashed border-cardBorder rounded-3xl max-w-md mx-auto my-8 space-y-4">
-                    <div class="w-14 h-14 rounded-full bg-pitch text-slate-500 flex items-center justify-center mx-auto text-2xl border border-cardBorder">
-                        <i class="fa-solid fa-filter-circle-xmark"></i>
+            <!-- Grid -->
+            <section aria-label="Mechanism results">
+                <div id="mechanismGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"></div>
+
+                <div id="emptyState" class="hidden text-center py-16 panel border-dashed max-w-md mx-auto my-8 space-y-4">
+                    <div class="w-12 h-12 rounded-[6px] bg-void text-ink3 flex items-center justify-center mx-auto border border-line">
+                        <i class="fa-solid fa-filter-circle-xmark text-lg" aria-hidden="true"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-bold text-slate-200">No mechanisms found</h3>
-                        <p class="text-xs text-slate-400 mt-1">Try resetting search keywords or changing season filter.</p>
+                        <h3 class="h3 text-ink">No mechanisms found</h3>
+                        <p class="text-[13px] text-ink2 mt-1.5">Try clearing the search, or widening the season filter.</p>
                     </div>
-                    <button id="resetFiltersBtn" class="px-4 py-2 rounded-xl bg-accentBlue/20 text-accentBlue border border-accentBlue/40 hover:bg-accentBlue/30 text-xs font-semibold">
-                        Reset All Filters
-                    </button>
+                    <button id="resetFiltersBtn" type="button" class="btn btn-ghost btn-sm mx-auto">Reset all filters</button>
                 </div>
             </section>
         </main>
     </div>
 
-    <footer class="border-t border-cardBorder bg-pitch/80 py-8 px-4 sm:px-6 lg:px-8 mt-auto">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
-            <div class="flex items-center gap-2">
-                <span class="font-bold text-white">Mechanism</span><span class="text-accentBlue font-bold">Vault</span>
-                <span>— Open Multi-Media & CAD Archive for FTC Teams</span>
+    <!-- ══════════════════════ FOOTER ══════════════════════ -->
+    <footer class="border-t border-line bg-void mt-auto">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div class="space-y-1.5">
+                <div class="text-[14px] font-semibold text-ink">Mechanism<span class="text-signal">Vault</span></div>
+                <div class="mono-label text-[10px]">Open multi-media &amp; CAD archive for FTC teams</div>
             </div>
-            <div>
-                Built for FIRST Tech Challenge Community Innovation
+            <div class="mono-label text-[10px] sm:text-right">
+                Built for FIRST Tech Challenge community innovation
             </div>
         </div>
     </footer>
 
-    <!-- Detail Modal -->
-    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
-        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 sm:p-5 border-b border-cardBorder flex items-start justify-between gap-4 bg-pitch/80">
-                <div>
-                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                        <span id="modalTeamTag" class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-accentBlue/10 text-accentBlue border border-accentBlue/30"></span>
-                        <span id="modalSeasonTag" class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-accentAmber/20 text-accentAmber border border-accentAmber/30 flex items-center gap-1.5"></span>
-                        <span id="modalCategoryTag" class="px-2.5 py-0.5 rounded-md text-xs font-mono font-semibold bg-pitch text-slate-300"></span>
+    <!-- ══════════════════════ DETAIL MODAL ══════════════════════ -->
+    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-panel max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+
+            <div class="p-5 border-b border-line flex items-start justify-between gap-4 bg-panel2">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span id="modalTeamTag" class="tag tag--signal"></span>
+                        <span id="modalSeasonTag" class="tag tag--amber"></span>
+                        <span id="modalCategoryTag" class="tag"></span>
                     </div>
-                    <h2 id="modalTitle" class="text-lg sm:text-xl font-bold text-white tracking-tight"></h2>
+                    <h2 id="modalTitle" class="h2 text-ink !text-lg sm:!text-xl"></h2>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button id="deleteMechanismBtn" class="p-2 rounded-xl text-rose-500 hover:text-white hover:bg-rose-500/20 transition-all" title="Delete Mechanism Globally">
-                        <i class="fa-solid fa-trash text-lg"></i>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button id="deleteMechanismBtn" type="button" class="btn-icon hover:!text-rose hover:!border-rose/50" aria-label="Delete this mechanism">
+                        <i class="fa-solid fa-trash text-sm" aria-hidden="true"></i>
                     </button>
-                    <button id="closeDetailModalBtn" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-cardBorder transition-all">
-                        <i class="fa-solid fa-xmark text-lg"></i>
+                    <button id="closeDetailModalBtn" type="button" class="btn-icon" aria-label="Close dialog">
+                        <i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Header Tabs with Conditional 3D CAD Tab -->
-            <div class="px-5 pt-3 bg-pitch/40 border-b border-cardBorder flex items-center gap-4 text-xs font-mono">
-                <button id="tabMediaBtn" class="px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-play"></i> Video / Media
+            <div class="px-5 bg-void/40 border-b border-line flex items-center gap-7" role="tablist">
+                <button id="tabMediaBtn" type="button" class="navtab is-active" role="tab">
+                    <i class="fa-solid fa-play text-[10px]" aria-hidden="true"></i> Video / Media
                 </button>
-                <button id="tabCadBtn" class="px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
-                    <i class="fa-solid fa-cube text-accentBlue"></i> Interactive 3D WebGL CAD
+                <button id="tabCadBtn" type="button" class="navtab" role="tab">
+                    <i class="fa-solid fa-cube text-[10px]" aria-hidden="true"></i> Interactive 3D CAD
                 </button>
             </div>
 
-            <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-slate-300 text-xs sm:text-sm">
-                <div id="modalMediaContainer" class="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-cardBorder shadow-inner"></div>
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-ink2 text-sm">
+                <div id="modalMediaContainer" class="relative w-full aspect-video rounded-[6px] overflow-hidden bg-black border border-line"></div>
 
-                <div id="modal3dCanvasContainer" class="relative w-full aspect-video rounded-xl overflow-hidden bg-pitch border border-cardBorder hidden shadow-inner">
+                <div id="modal3dCanvasContainer" class="relative w-full aspect-video rounded-[6px] overflow-hidden bg-void border border-line hidden">
                     <div id="threeJsViewport" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
-                    <div class="absolute bottom-3 left-3 bg-pitch/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-cardBorder text-[11px] font-mono flex items-center gap-3">
-                        <span class="text-slate-400"><i class="fa-solid fa-hand-pointer text-accentBlue"></i> Orbit: Drag | Zoom: Scroll</span>
-                        <button id="reset3dCameraBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-rotate-left"></i> Reset Camera</button>
-                        <button id="toggle3dWireframeBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-border-all"></i> Wireframe</button>
+                    <div class="absolute bottom-3 left-3 bg-void/85 backdrop-blur-md px-3 py-2 rounded-[5px] border border-line text-[11px] font-mono flex items-center gap-4">
+                        <span class="text-ink3">Drag to orbit · scroll to zoom</span>
+                        <button id="reset3dCameraBtn" type="button" class="text-ink2 hover:text-signal font-semibold transition-colors">Reset</button>
+                        <button id="toggle3dWireframeBtn" type="button" class="text-ink2 hover:text-signal font-semibold transition-colors">Wireframe</button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-4 rounded-xl bg-pitch/80 border border-cardBorder">
-                        <h4 class="text-xs font-mono font-bold uppercase text-accentBlue mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-screwdriver-wrench"></i> Bill of Materials (BOM)
-                        </h4>
-                        <ul id="modalHardwareSpecs" class="space-y-1.5 text-xs text-slate-300 list-disc list-inside"></ul>
+                    <div class="panel p-4 bg-void/50">
+                        <h3 class="mono-label mono-label--signal mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-screwdriver-wrench text-[11px]" aria-hidden="true"></i> Bill of Materials
+                        </h3>
+                        <ul id="modalHardwareSpecs" class="space-y-1.5 text-[13px] text-ink2 list-disc list-inside marker:text-signal"></ul>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-pitch/80 border border-cardBorder">
-                        <h4 class="text-xs font-mono font-bold uppercase text-accentAmber mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-code"></i> Software & Motion Control Logic
-                        </h4>
-                        <p id="modalSoftwareNotes" class="text-xs text-slate-300 leading-relaxed font-mono bg-black/50 p-3 rounded-lg border border-cardBorder"></p>
+                    <div class="panel p-4 bg-void/50">
+                        <h3 class="mono-label mb-3 flex items-center gap-2" style="color:var(--amber)">
+                            <i class="fa-solid fa-code text-[11px]" aria-hidden="true"></i> Software &amp; Motion Control
+                        </h3>
+                        <p id="modalSoftwareNotes" class="text-[12px] text-ink2 leading-relaxed font-mono bg-void p-3 rounded-[5px] border border-line"></p>
                     </div>
                 </div>
 
-                <div id="modalCadContainer" class="hidden p-4 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-between gap-4">
+                <div id="modalCadContainer" class="hidden panel p-4 border-signal/35 bg-signal/8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h4 class="text-xs font-mono font-bold text-accentBlue flex items-center gap-2">
-                            <i class="fa-solid fa-cube"></i> Public Onshape / CAD Assembly
-                        </h4>
-                        <p class="text-[11px] text-slate-400">Access original CAD document to measure, export parts, and view assembly hierarchy.</p>
+                        <h3 class="mono-label mono-label--signal flex items-center gap-2">
+                            <i class="fa-solid fa-cube text-[11px]" aria-hidden="true"></i> Public Onshape / CAD Assembly
+                        </h3>
+                        <p class="text-[13px] text-ink2 mt-1.5">Open the original document to measure, export parts and view the assembly hierarchy.</p>
                     </div>
-                    <a id="modalCadLink" href="#" target="_blank" class="px-3.5 py-2 rounded-lg bg-accentBlue text-white font-semibold text-xs hover:bg-accentBlueHover transition-all flex items-center gap-1.5 shrink-0">
+                    <a id="modalCadLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm shrink-0">
                         <span>Launch CAD</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
 
-            <div class="p-4 border-t border-cardBorder bg-pitch/80 flex flex-wrap items-center justify-between gap-3">
+            <div class="p-4 border-t border-line bg-panel2 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
-                    <button id="modalBookmarkToggleBtn" class="px-3.5 py-2 rounded-xl bg-cardBg border border-cardBorder hover:border-accentAmber/60 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
-                        <i class="fa-regular fa-bookmark text-accentAmber"></i> Save to Bookmarks
+                    <button id="modalBookmarkToggleBtn" type="button" class="btn btn-quiet btn-sm">
+                        <i class="fa-regular fa-bookmark text-amber text-[12px]" aria-hidden="true"></i> Save
                     </button>
-                    <button id="modalCopyLinkBtn" class="px-3.5 py-2 rounded-xl bg-cardBg border border-cardBorder hover:border-accentBlue text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all">
-                        <i class="fa-regular fa-copy text-accentBlue"></i> Share Link
+                    <button id="modalCopyLinkBtn" type="button" class="btn btn-quiet btn-sm">
+                        <i class="fa-regular fa-copy text-[12px]" aria-hidden="true"></i> Share link
                     </button>
                 </div>
-                <a id="modalDirectMediaLink" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border border-blue-500/30 text-xs font-semibold flex items-center gap-2 transition-all">
-                    <i class="fa-solid fa-arrow-up-right-from-square text-blue-400"></i> Open Original Media
+                <a id="modalDirectMediaLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i> Open original media
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Side-by-Side Mechanism Compare Modal -->
-    <div id="compareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
-        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 sm:p-5 border-b border-cardBorder flex items-center justify-between bg-pitch">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-code-compare text-accentBlue"></i> Side-by-Side Mechanism Comparison
-                </h3>
-                <button id="closeCompareModalBtn" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <!-- ══════════════════════ COMPARE MODAL ══════════════════════ -->
+    <div id="compareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="compareHeading">
+        <div class="modal-panel max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="p-5 border-b border-line flex items-center justify-between bg-panel2">
+                <h2 id="compareHeading" class="h3 text-ink flex items-center gap-2.5">
+                    <i class="fa-solid fa-code-compare text-signal text-sm" aria-hidden="true"></i> Side-by-Side Comparison
+                </h2>
+                <button id="closeCompareModalBtn" type="button" class="btn-icon" aria-label="Close dialog">
+                    <i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
                 </button>
             </div>
-            
-            <div id="compareContent" class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs"></div>
+            <div id="compareContent" class="p-5 sm:p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-5"></div>
         </div>
     </div>
 
-    <!-- Submit Mechanism Modal -->
-    <div id="submitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pitch/90 backdrop-blur-md hidden transition-opacity duration-200">
-        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[95vh] overflow-y-auto">
-            <button id="closeSubmitModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
-                <i class="fa-solid fa-plus-circle text-accentBlue"></i> Submit Mechanism
-            </h3>
-            <p class="text-xs text-slate-400 mb-4">Add a new FTC subsystem from CAD, YouTube, Instagram, or team reveals.</p>
+    <!-- ══════════════════════ SUBMIT MODAL ══════════════════════ -->
+    <div id="submitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="submitHeading">
+        <div class="modal-panel max-w-lg w-full max-h-[95vh] overflow-y-auto">
+            <div class="p-5 border-b border-line bg-panel2 flex items-start justify-between gap-4 sticky top-0 z-10">
+                <div>
+                    <h2 id="submitHeading" class="h3 text-ink flex items-center gap-2.5">
+                        <i class="fa-solid fa-plus text-signal text-xs" aria-hidden="true"></i> Submit a Mechanism
+                    </h2>
+                    <p class="text-[13px] text-ink2 mt-1.5">Publish an FTC subsystem with CAD, video or team reveal links.</p>
+                </div>
+                <button id="closeSubmitModalBtn" type="button" class="btn-icon shrink-0" aria-label="Close dialog">
+                    <i class="fa-solid fa-xmark text-base" aria-hidden="true"></i>
+                </button>
+            </div>
 
-            <form id="submissionForm" class="space-y-3.5">
-                <div class="grid grid-cols-2 gap-3">
+            <form id="submissionForm" class="p-5 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Team # & Name *</label>
-                        <input type="text" id="subTeam" required placeholder="e.g. #11115 Gluten Free" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                        <label for="subTeam" class="field-label">Team # &amp; Name *</label>
+                        <input type="text" id="subTeam" required placeholder="#11115 Gluten Free" class="field">
                     </div>
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Season *</label>
-                        <select id="subSeason" required class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                        <label for="subSeason" class="field-label">Season *</label>
+                        <select id="subSeason" required class="field">
                             <option value="BIOBUZZ (2026-2027)">BIOBUZZ (2026-2027)</option>
                             <option value="DECODE (2025-2026)">DECODE (2025-2026)</option>
                             <option value="INTO THE DEEP (2024-2025)">INTO THE DEEP (2024-2025)</option>
@@ -645,25 +994,25 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-mono text-slate-300 mb-1">Mechanism Title *</label>
-                    <input type="text" id="subTitle" required placeholder="e.g. Active Spintake & Differential Wrist" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                    <label for="subTitle" class="field-label">Mechanism Title *</label>
+                    <input type="text" id="subTitle" required placeholder="Active Spintake &amp; Differential Wrist" class="field">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Subsystem Category *</label>
-                        <select id="subCategory" required class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                        <label for="subCategory" class="field-label">Subsystem Category *</label>
+                        <select id="subCategory" required class="field">
                             <option value="Intake">Intake</option>
-                            <option value="Outtake & Lift">Outtake & Lift</option>
+                            <option value="Outtake &amp; Lift">Outtake &amp; Lift</option>
                             <option value="Shooter / Launcher">Shooter / Launcher</option>
                             <option value="Transfer">Transfer / Passthrough</option>
                             <option value="Full Robot">Full Robot Reveal</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">3D CAD Preset Model</label>
-                        <select id="subCad3dType" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
-                            <option value="NONE">No 3D CAD Preset Model</option>
+                        <label for="subCad3dType" class="field-label">3D CAD Preset Model</label>
+                        <select id="subCad3dType" class="field">
+                            <option value="NONE">No 3D CAD preset</option>
                             <option value="ELEVATOR">Viper Slide Linear Elevator</option>
                             <option value="CATAPULT">Tensioned Catapult Launcher</option>
                             <option value="SPINTAKE">Active Spintake Roller</option>
@@ -672,48 +1021,50 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Media Link (YouTube / Instagram)</label>
-                        <input type="url" id="subVideoUrl" placeholder="https://youtube.com or instagram.com..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                        <label for="subVideoUrl" class="field-label">Media Link</label>
+                        <input type="url" id="subVideoUrl" placeholder="youtube.com / instagram.com…" class="field">
+                        <p class="text-[11px] text-ink3 mt-1.5">YouTube or Instagram URL.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-mono text-slate-300 mb-1">Onshape / CAD URL</label>
-                        <input type="url" id="subCadUrl" placeholder="https://cad.onshape.com/..." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                        <label for="subCadUrl" class="field-label">Onshape / CAD URL</label>
+                        <input type="url" id="subCadUrl" placeholder="cad.onshape.com/…" class="field">
+                        <p class="text-[11px] text-ink3 mt-1.5">Public document link.</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-mono text-slate-300 mb-1">Components / BOM (Comma separated)</label>
-                    <input type="text" id="subHardware" placeholder="e.g. Viper Slide, Axon Servos, Green Compliant Wheels" class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none">
+                    <label for="subHardware" class="field-label">Components / BOM</label>
+                    <input type="text" id="subHardware" placeholder="Viper Slide, Axon Servos, Compliant Wheels" class="field">
+                    <p class="text-[11px] text-ink3 mt-1.5">Comma separated.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-mono text-slate-300 mb-1">Software Logic / Control Notes</label>
-                    <textarea id="subSoftware" rows="2" placeholder="e.g. Velocity PIDF control with auto-alignment." class="w-full px-3 py-2 bg-pitch border border-cardBorder rounded-xl text-slate-200 text-xs focus:border-accentBlue focus:outline-none"></textarea>
+                    <label for="subSoftware" class="field-label">Software / Control Notes</label>
+                    <textarea id="subSoftware" rows="3" placeholder="Velocity PIDF control with auto-alignment…" class="field"></textarea>
                 </div>
 
-                <button type="submit" id="submitFormBtn" class="w-full py-2.5 rounded-xl bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-xs shadow-lg glow-blue-sm transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span>Broadcast Mechanism to Vault</span>
+                <button type="submit" id="submitFormBtn" class="btn btn-primary w-full">
+                    <i class="fa-solid fa-cloud-arrow-up text-[12px]" aria-hidden="true"></i>
+                    <span>Publish to the Vault</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Bookmarks Drawer -->
-    <div id="bookmarksDrawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-cardBg border-l border-cardBorder shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 border-b border-cardBorder flex items-center justify-between bg-pitch">
-            <h3 class="text-xs font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-bookmark text-accentAmber"></i> Saved Bookmarks
-            </h3>
-            <button id="closeBookmarksDrawerBtn" class="text-slate-400 hover:text-white p-1">
-                <i class="fa-solid fa-xmark text-base"></i>
+    <!-- ══════════════════════ BOOKMARKS DRAWER ══════════════════════ -->
+    <div id="bookmarksDrawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-panel border-l border-line shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" role="dialog" aria-modal="true" aria-labelledby="bookmarksHeading">
+        <div class="p-4 border-b border-line flex items-center justify-between bg-panel2">
+            <h2 id="bookmarksHeading" class="h3 text-ink flex items-center gap-2.5 !text-sm">
+                <i class="fa-solid fa-bookmark text-amber text-xs" aria-hidden="true"></i> Saved Mechanisms
+            </h2>
+            <button id="closeBookmarksDrawerBtn" type="button" class="btn-icon !w-9 !h-9" aria-label="Close saved mechanisms">
+                <i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
             </button>
         </div>
-        <div id="bookmarksList" class="p-4 flex-1 overflow-y-auto space-y-3"></div>
+        <div id="bookmarksList" class="p-4 flex-1 overflow-y-auto space-y-2.5"></div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -904,15 +1255,15 @@
         ];
 
         const seasonsList = [
-            { label: 'All Seasons', key: 'ALL', icon: 'fa-solid fa-layer-group' },
-            { label: 'BIOBUZZ (2026-2027)', key: '2026-2027', icon: 'fa-solid fa-bug', badge: 'NEW' },
-            { label: 'DECODE (2025-2026)', key: '2025-2026', icon: 'fa-solid fa-code' },
-            { label: 'INTO THE DEEP (2024-2025)', key: '2024-2025', icon: 'fa-solid fa-water' },
-            { label: 'CENTERSTAGE (2023-2024)', key: '2023-2024', icon: 'fa-solid fa-masks-theater' },
-            { label: 'POWERPLAY (2022-2023)', key: '2022-2023', icon: 'fa-solid fa-bolt' },
-            { label: 'FREIGHT FRENZY (2021-2022)', key: '2021-2022', icon: 'fa-solid fa-box' },
-            { label: 'ULTIMATE GOAL (2020-2021)', key: '2020-2021', icon: 'fa-solid fa-bullseye' },
-            { label: 'SKYSTONE (2019-2020)', key: '2019-2020', icon: 'fa-solid fa-cubes-stacked' }
+            { label: 'All Seasons', shortLabel: 'All', key: 'ALL', icon: 'fa-solid fa-layer-group' },
+            { label: 'BIOBUZZ (2026-2027)', shortLabel: 'Biobuzz', key: '2026-2027', icon: 'fa-solid fa-bug', badge: 'New' },
+            { label: 'DECODE (2025-2026)', shortLabel: 'Decode', key: '2025-2026', icon: 'fa-solid fa-code' },
+            { label: 'INTO THE DEEP (2024-2025)', shortLabel: 'Into the Deep', key: '2024-2025', icon: 'fa-solid fa-water' },
+            { label: 'CENTERSTAGE (2023-2024)', shortLabel: 'Centerstage', key: '2023-2024', icon: 'fa-solid fa-masks-theater' },
+            { label: 'POWERPLAY (2022-2023)', shortLabel: 'Powerplay', key: '2022-2023', icon: 'fa-solid fa-bolt' },
+            { label: 'FREIGHT FRENZY (2021-2022)', shortLabel: 'Freight Frenzy', key: '2021-2022', icon: 'fa-solid fa-box' },
+            { label: 'ULTIMATE GOAL (2020-2021)', shortLabel: 'Ultimate Goal', key: '2020-2021', icon: 'fa-solid fa-bullseye' },
+            { label: 'SKYSTONE (2019-2020)', shortLabel: 'Skystone', key: '2019-2020', icon: 'fa-solid fa-cubes-stacked' }
         ];
 
         let mechanismsData = [];
@@ -921,9 +1272,33 @@
         let activeCategory = 'ALL';
         let searchQuery = '';
         let showCadOnly = false;
-        let bookmarkedIds = new Set();
+        const BOOKMARKS_KEY = 'ftc_vault_bookmarks';
+
+        // localStorage can throw in private mode or with site data blocked, so every
+        // access is guarded and the app still works with bookmarks held in memory only.
+        function loadBookmarks() {
+            try {
+                const raw = localStorage.getItem(BOOKMARKS_KEY);
+                const ids = raw ? JSON.parse(raw) : [];
+                return new Set(Array.isArray(ids) ? ids : []);
+            } catch (e) {
+                return new Set();
+            }
+        }
+
+        function saveBookmarks() {
+            try {
+                localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...bookmarkedIds]));
+            } catch (e) {
+                /* bookmarks stay for this session only */
+            }
+        }
+
+        let bookmarkedIds = loadBookmarks();
         let compareIds = new Set();
         let currentModalMech = null;
+        let pendingMechId = null;
+        let lastFocusedBeforeOverlay = null;
 
         let scene3d, camera3d, renderer3d, controls3d, currentMesh3d, animReq3d;
         let isWireframe3d = false;
@@ -971,7 +1346,7 @@
 
         function loadCadFile(container, cadUrl, fileType) {
             const loading = document.createElement('div');
-            loading.className = 'absolute inset-0 flex items-center justify-center text-xs text-slate-400 font-mono';
+            loading.className = 'absolute inset-0 flex items-center justify-center text-xs text-ink3 font-mono';
             loading.innerText = 'Loading CAD file...';
             container.appendChild(loading);
 
@@ -979,7 +1354,7 @@
                 loading.remove();
                 const object = model.scene || model;
                 object.traverse((child) => {
-                    if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0x2563eb, metalness: 0.45, roughness: 0.3 });
+                    if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0xff7a2f, metalness: 0.45, roughness: 0.3 });
                 });
                 const box = new THREE.Box3().setFromObject(object);
                 const size = box.getSize(new THREE.Vector3());
@@ -988,14 +1363,14 @@
                 object.position.sub(center).multiplyScalar(scale);
                 object.scale.setScalar(scale);
                 const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x020617);
+                scene.background = new THREE.Color(0x08090c);
                 const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 1000);
                 camera.position.set(4, 3, 5);
                 const renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(container.clientWidth, container.clientHeight);
                 container.appendChild(renderer.domElement);
                 scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-                const light = new THREE.DirectionalLight(0x06b6d4, 1.2);
+                const light = new THREE.DirectionalLight(0x2dd4bf, 1.2);
                 light.position.set(5, 8, 5);
                 scene.add(light, object);
                 const animate = () => {
@@ -1029,7 +1404,7 @@
 
             // Scene & Camera
             scene3d = new THREE.Scene();
-            scene3d.background = new THREE.Color(0x020617);
+            scene3d.background = new THREE.Color(0x08090c);
 
             camera3d = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
             camera3d.position.set(4, 3, 5);
@@ -1051,23 +1426,23 @@
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene3d.add(ambientLight);
 
-            const dirLight1 = new THREE.DirectionalLight(0x2563eb, 1.2);
+            const dirLight1 = new THREE.DirectionalLight(0xff7a2f, 1.2);
             dirLight1.position.set(5, 10, 7);
             scene3d.add(dirLight1);
 
-            const dirLight2 = new THREE.DirectionalLight(0x06b6d4, 0.8);
+            const dirLight2 = new THREE.DirectionalLight(0x2dd4bf, 0.8);
             dirLight2.position.set(-5, -5, -5);
             scene3d.add(dirLight2);
 
             // Grid Floor
-            const gridHelper = new THREE.GridHelper(10, 20, 0x2563eb, 0x1e293b);
+            const gridHelper = new THREE.GridHelper(10, 20, 0xff7a2f, 0x24282f);
             gridHelper.position.y = -1;
             scene3d.add(gridHelper);
 
             // Create 3D Parametric CAD Geometry Preset
             const group = new THREE.Group();
             const material = new THREE.MeshStandardMaterial({
-                color: 0x2563eb,
+                color: 0xff7a2f,
                 metalness: 0.5,
                 roughness: 0.2,
                 wireframe: isWireframe3d
@@ -1078,7 +1453,7 @@
                 const rail1 = new THREE.Mesh(railGeo, material); rail1.position.x = -0.8;
                 const rail2 = new THREE.Mesh(railGeo, material); rail2.position.x = 0.8;
                 const carGeo = new THREE.BoxGeometry(1.4, 0.6, 0.4);
-                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xf59e0b, wireframe: isWireframe3d }));
+                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xfbbf24, wireframe: isWireframe3d }));
                 carriage.position.y = 0.5;
                 group.add(rail1, rail2, carriage);
             } else if (cadType === 'CATAPULT') {
@@ -1102,7 +1477,7 @@
                 shaft.rotation.z = Math.PI / 2;
                 for (let i = -1; i <= 1; i += 0.5) {
                     const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 24);
-                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x10b981, wireframe: isWireframe3d });
+                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x34d399, wireframe: isWireframe3d });
                     const wheel = new THREE.Mesh(wheelGeo, wheelMat);
                     wheel.rotation.z = Math.PI / 2;
                     wheel.position.x = i;
@@ -1128,7 +1503,7 @@
             const height = canvas.height || 180;
 
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x070d19);
+            scene.background = new THREE.Color(0x101217);
 
             const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
             camera.position.set(3.5, 2.5, 4);
@@ -1139,23 +1514,23 @@
 
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0x2563eb, 1.2);
+            const dirLight = new THREE.DirectionalLight(0xff7a2f, 1.2);
             dirLight.position.set(5, 8, 5);
             scene.add(dirLight);
 
-            const gridHelper = new THREE.GridHelper(8, 12, 0x2563eb, 0x1e293b);
+            const gridHelper = new THREE.GridHelper(8, 12, 0xff7a2f, 0x24282f);
             gridHelper.position.y = -1;
             scene.add(gridHelper);
 
             const group = new THREE.Group();
-            const material = new THREE.MeshStandardMaterial({ color: 0x2563eb, metalness: 0.4, roughness: 0.3 });
+            const material = new THREE.MeshStandardMaterial({ color: 0xff7a2f, metalness: 0.4, roughness: 0.3 });
 
             if (cadType === 'ELEVATOR') {
                 const railGeo = new THREE.BoxGeometry(0.2, 2.5, 0.2);
                 const r1 = new THREE.Mesh(railGeo, material); r1.position.x = -0.6;
                 const r2 = new THREE.Mesh(railGeo, material); r2.position.x = 0.6;
                 const carGeo = new THREE.BoxGeometry(1.1, 0.5, 0.3);
-                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
+                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xfbbf24 }));
                 group.add(r1, r2, carriage);
             } else if (cadType === 'CATAPULT') {
                 const base = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.2, 1.2), material);
@@ -1172,7 +1547,7 @@
                 const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.5, 16), material);
                 shaft.rotation.z = Math.PI / 2;
                 for (let i = -0.8; i <= 0.8; i += 0.5) {
-                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 16), new THREE.MeshStandardMaterial({ color: 0x10b981 }));
+                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 16), new THREE.MeshStandardMaterial({ color: 0x34d399 }));
                     wheel.rotation.z = Math.PI / 2;
                     wheel.position.x = i;
                     group.add(wheel);
@@ -1185,6 +1560,168 @@
             renderer.render(scene, camera);
         }
 
+        // ---------- URL state (shareable links) ----------
+        function buildStateParams(includeMech) {
+            const params = new URLSearchParams();
+            if (includeMech && currentModalMech) params.set('m', currentModalMech.id);
+            if (currentView === 'vault') params.set('view', 'vault');
+            if (activeSeasonKey !== 'ALL') params.set('season', activeSeasonKey);
+            if (activeCategory !== 'ALL') params.set('cat', activeCategory);
+            if (showCadOnly) params.set('cad', '1');
+            if (searchQuery.trim()) params.set('q', searchQuery.trim());
+            return params;
+        }
+
+        function syncUrl() {
+            const params = buildStateParams(true);
+            const qs = params.toString();
+            const url = location.pathname + (qs ? '?' + qs : '') + location.hash;
+            try {
+                history.replaceState(null, '', url);
+            } catch (e) {
+                /* replaceState can throw on file:// — the app is unaffected */
+            }
+        }
+
+        // writeText needs a secure context AND transient user activation, and throws
+        // rather than returning false when either is missing — so always fall through
+        // to the execCommand path before giving up.
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (e) { /* fall through to the legacy path */ }
+            }
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                return ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function mechanismShareUrl(id) {
+            const url = new URL(location.href);
+            url.search = '';
+            url.searchParams.set('m', id);
+            return url.toString();
+        }
+
+        // A deep-linked mechanism may arrive before Firestore has loaded, so the id is
+        // parked and retried after each render until the record exists.
+        function tryOpenPendingMechanism() {
+            if (!pendingMechId) return;
+            if (!mechanismsData.some(m => m.id === pendingMechId)) return;
+            const id = pendingMechId;
+            pendingMechId = null;
+            openDetailModal(id);
+        }
+
+        function applyUrlState() {
+            const params = new URLSearchParams(location.search);
+            if (!params.toString()) return;
+
+            const season = params.get('season');
+            if (season && seasonsList.some(x => x.key === season)) activeSeasonKey = season;
+
+            const cat = params.get('cat');
+            if (cat) {
+                const pill = document.querySelector(`#categoryPillGroup .cat-pill[data-category="${CSS.escape(cat)}"]`);
+                if (pill) {
+                    activeCategory = cat;
+                    document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(x => x.className = 'cat-pill pill');
+                    pill.className = 'cat-pill pill is-active';
+                }
+            }
+
+            if (params.get('cad') === '1') {
+                showCadOnly = true;
+                const toggle = document.getElementById('cadOnlyToggle');
+                if (toggle) toggle.checked = true;
+            }
+
+            const q = params.get('q');
+            if (q) {
+                searchQuery = q;
+                const input = document.getElementById('vaultSearchInput');
+                if (input) input.value = q;
+                const clearBtn = document.getElementById('clearSearchBtn');
+                if (clearBtn) clearBtn.classList.remove('hidden');
+            }
+
+            const mech = params.get('m');
+            if (mech) pendingMechId = mech;
+
+            if (mech || params.get('view') === 'vault' || season || cat || q || params.get('cad')) {
+                switchView('vault');
+            }
+        }
+
+        // ---------- Overlays: escape, backdrop, focus return ----------
+        function isOverlayOpen(el) {
+            return !!el && !el.classList.contains('hidden');
+        }
+
+        function rememberFocus() {
+            lastFocusedBeforeOverlay = document.activeElement;
+        }
+
+        function restoreFocus() {
+            const el = lastFocusedBeforeOverlay;
+            lastFocusedBeforeOverlay = null;
+            if (el && typeof el.focus === 'function' && document.contains(el)) {
+                el.focus();
+            }
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            if (animReq3d) cancelAnimationFrame(animReq3d);
+            // Clearing the containers stops the autoplaying video and the WebGL loop
+            document.getElementById('modal3dCanvasContainer').innerHTML = '';
+            document.getElementById('modalMediaContainer').innerHTML = '';
+            currentModalMech = null;
+            syncUrl();
+            restoreFocus();
+        }
+
+        function closeCompareModal() {
+            document.getElementById('compareModal').classList.add('hidden');
+            restoreFocus();
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.add('hidden');
+            restoreFocus();
+        }
+
+        function closeBookmarksDrawer() {
+            document.getElementById('bookmarksDrawer').classList.add('translate-x-full');
+            restoreFocus();
+        }
+
+        function isDrawerOpen() {
+            const drawer = document.getElementById('bookmarksDrawer');
+            return !!drawer && !drawer.classList.contains('translate-x-full');
+        }
+
+        // Closes whichever overlay is on top; returns true if one was closed.
+        function closeTopmostOverlay() {
+            if (isOverlayOpen(document.getElementById('detailModal'))) { closeDetailModal(); return true; }
+            if (isOverlayOpen(document.getElementById('submitModal'))) { closeSubmitModal(); return true; }
+            if (isOverlayOpen(document.getElementById('compareModal'))) { closeCompareModal(); return true; }
+            if (isDrawerOpen()) { closeBookmarksDrawer(); return true; }
+            return false;
+        }
+
         function switchView(targetView) {
             currentView = targetView;
             const homeView = document.getElementById('homeView');
@@ -1195,13 +1732,13 @@
             if (targetView === 'home') {
                 homeView.classList.remove('hidden');
                 vaultView.classList.add('hidden');
-                navHomeBtn.className = "px-3 py-2 rounded-lg text-white hover:text-accentBlue transition-colors font-bold flex items-center gap-1.5 border-b-2 border-accentBlue";
-                navVaultBtn.className = "px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold flex items-center gap-1.5 border-b-2 border-transparent";
+                navHomeBtn.className = "navtab is-active";
+                navVaultBtn.className = "navtab";
             } else {
                 homeView.classList.add('hidden');
                 vaultView.classList.remove('hidden');
-                navHomeBtn.className = "px-3 py-2 rounded-lg text-slate-400 hover:text-white transition-colors font-bold flex items-center gap-1.5 border-b-2 border-transparent";
-                navVaultBtn.className = "px-3 py-2 rounded-lg text-white hover:text-accentBlue transition-colors font-bold flex items-center gap-1.5 border-b-2 border-accentBlue";
+                navHomeBtn.className = "navtab";
+                navVaultBtn.className = "navtab is-active";
                 filterAndRenderGrid();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1240,6 +1777,7 @@
                         mechanismsData = cloudMechs;
                         localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
                         filterAndRenderGrid();
+                        tryOpenPendingMechanism();
                     }
                 }, (err) => {
                     console.warn("Firestore listener fallback:", err);
@@ -1259,7 +1797,7 @@
             const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'analytics');
             onSnapshot(statsDocRef, (docSnap) => {
                 const views = docSnap.exists() ? (docSnap.data().websiteViews || 0) : 0;
-                const viewsEl = document.querySelector('#statWebsiteViews span');
+                const viewsEl = document.getElementById('statWebsiteViews');
                 if (viewsEl) viewsEl.innerText = formatNumber(views);
             });
 
@@ -1281,7 +1819,7 @@
 
         function setupLocalViewCounter() {
             const localViews = parseInt(localStorage.getItem('ftc_vault_views') || '0', 10);
-            const viewsEl = document.querySelector('#statWebsiteViews span');
+            const viewsEl = document.getElementById('statWebsiteViews');
             if (viewsEl) viewsEl.innerText = formatNumber(localViews);
         }
 
@@ -1306,6 +1844,7 @@
                 localStorage.setItem('ftc_mechs_blue_v2', JSON.stringify(mechanismsData));
             }
             filterAndRenderGrid();
+            tryOpenPendingMechanism();
         }
 
         function renderSeasonTimeline() {
@@ -1313,14 +1852,9 @@
             container.innerHTML = seasonsList.map(s => {
                 const isActive = s.key === activeSeasonKey;
                 return `
-                    <button data-season-key="${s.key}" class="timeline-btn snap-start shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-2 border ${
-                        isActive 
-                        ? 'bg-accentBlue text-white border-accentBlue shadow-lg glow-blue-sm font-bold' 
-                        : 'bg-cardBg border-cardBorder text-slate-400 hover:border-slate-500 hover:text-slate-200'
-                    }">
-                        <i class="${s.icon} ${isActive ? 'text-cyan-300' : 'text-accentBlue'} text-sm"></i>
-                        <span>${s.label}</span>
-                        ${s.badge ? `<span class="px-1.5 py-0.2 text-[9px] rounded bg-accentAmber text-pitch font-extrabold">${s.badge}</span>` : ''}
+                    <button type="button" data-season-key="${s.key}" aria-pressed="${isActive}" class="timeline-btn season-tab ${isActive ? 'is-active' : ''}">
+                        <span>${s.shortLabel || s.label}</span>
+                        ${s.badge ? `<span class="text-[10px] font-semibold px-1.5 py-px rounded-[3px] bg-amber/15 text-amber">${s.badge}</span>` : ''}
                     </button>
                 `;
             }).join('');
@@ -1352,12 +1886,12 @@
             const bannerBadge = document.getElementById('archiveBannerSeasonBadge');
 
             if (activeSeasonKey === 'ALL') {
-                if (bannerTitle) bannerTitle.innerText = 'FTC Mechanism Vault & Historical Archive';
-                if (bannerBadge) bannerBadge.innerText = 'ALL SEASONS';
+                if (bannerTitle) bannerTitle.innerText = 'Mechanism Archive';
+                if (bannerBadge) bannerBadge.innerText = 'All seasons';
             } else {
                 const sObj = seasonsList.find(s => s.key === activeSeasonKey);
                 if (sObj) {
-                    if (bannerTitle) bannerTitle.innerText = `${sObj.label} ARCHIVE`;
+                    if (bannerTitle) bannerTitle.innerText = sObj.shortLabel || sObj.label;
                     if (bannerBadge) bannerBadge.innerText = sObj.key;
                 }
             }
@@ -1373,6 +1907,16 @@
             document.getElementById('modalCategoryTag').innerText = m.category;
             document.getElementById('modalTitle').innerText = m.title;
 
+            // Anonymous auth gives each browser a stable uid. Only the submitter sees
+            // Delete, and records with no authorUid (everything seeded) can never be
+            // deleted from the UI. This is a guard rail, not security — the Firestore
+            // rules in firestore.rules are what actually enforce it.
+            const deleteBtn = document.getElementById('deleteMechanismBtn');
+            if (deleteBtn) {
+                const myUid = (auth && auth.currentUser) ? auth.currentUser.uid : null;
+                deleteBtn.style.display = (myUid && m.authorUid && m.authorUid === myUid) ? '' : 'none';
+            }
+
             // Determine visibility & states of tabs
             const hasMedia = hasValidMedia(m);
             const tabMediaBtn = document.getElementById('tabMediaBtn');
@@ -1387,13 +1931,13 @@
                     mediaContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${m.youtubeId}?autoplay=1" title="${m.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     mediaContainer.innerHTML = `
-                        <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-obsidian">
-                            <i class="fa-brands fa-instagram text-5xl text-pink-500 mb-3"></i>
-                            <h4 class="text-sm font-bold text-white mb-1">Instagram Media Clip</h4>
-                            <p class="text-xs text-slate-400 max-w-sm mb-4">View this mechanism showcase video directly on Instagram.</p>
-                            <a href="${m.mediaUrl}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg">
+                        <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-panel2">
+                            <i class="fa-brands fa-instagram text-4xl text-violet mb-4" aria-hidden="true"></i>
+                            <h3 class="h3 text-ink mb-1.5">Instagram clip</h3>
+                            <p class="text-[13px] text-ink2 max-w-sm mb-5 leading-relaxed">This mechanism showcase is hosted on Instagram and opens in a new tab.</p>
+                            <a href="${m.mediaUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
                                 <span>Open in Instagram</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i>
                             </a>
                         </div>
                     `;
@@ -1428,24 +1972,39 @@
             const directLink = hasMedia ? m.mediaUrl : (m.hasCad ? m.cadUrl : '#');
             document.getElementById('modalDirectMediaLink').href = directLink || '#';
             document.getElementById('modalDirectMediaLink').innerHTML = hasMedia
-                ? '<i class="fa-solid fa-arrow-up-right-from-square text-blue-400"></i> Open Original Media'
-                : '<i class="fa-solid fa-arrow-up-right-from-square text-blue-400"></i> Open CAD File';
+                ? '<i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i> Open original media'
+                : '<i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i> Open CAD file';
 
             // Reset Tab UI selection based on availability
             if (hasMedia) {
                 document.getElementById('modalMediaContainer').classList.remove('hidden');
                 document.getElementById('modal3dCanvasContainer').classList.add('hidden');
-                tabMediaBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
-                tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+                tabMediaBtn.className = "navtab is-active";
+                tabCadBtn.className = "navtab";
             } else if (m.hasCad) {
                 document.getElementById('modalMediaContainer').classList.add('hidden');
                 document.getElementById('modal3dCanvasContainer').classList.remove('hidden');
-                tabCadBtn.className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
-                tabMediaBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+                tabCadBtn.className = "navtab is-active";
+                tabMediaBtn.className = "navtab";
                 setTimeout(() => document.getElementById('tabCadBtn').click(), 10); // Automatically build CAD view
             }
 
+            rememberFocus();
             document.getElementById('detailModal').classList.remove('hidden');
+            syncModalBookmarkButton();
+            syncUrl();
+            const closeBtn = document.getElementById('closeDetailModalBtn');
+            if (closeBtn) closeBtn.focus();
+        }
+
+        function syncModalBookmarkButton() {
+            const btn = document.getElementById('modalBookmarkToggleBtn');
+            if (!btn || !currentModalMech) return;
+            const saved = bookmarkedIds.has(currentModalMech.id);
+            btn.setAttribute('aria-pressed', saved ? 'true' : 'false');
+            btn.innerHTML = saved
+                ? '<i class="fa-solid fa-bookmark text-amber text-[12px]" aria-hidden="true"></i> Saved'
+                : '<i class="fa-regular fa-bookmark text-amber text-[12px]" aria-hidden="true"></i> Save';
         }
 
         function filterAndRenderGrid() {
@@ -1468,6 +2027,8 @@
             const emptyState = document.getElementById('emptyState');
             document.getElementById('resultsCount').innerText = filtered.length;
 
+            syncUrl();
+
             updateCounterStats(filtered.length);
 
             if (filtered.length === 0) {
@@ -1477,86 +2038,52 @@
             }
 
             emptyState.classList.add('hidden');
-            grid.innerHTML = filtered.map(m => {
+            grid.innerHTML = filtered.map((m, idx) => {
                 const isSaved = bookmarkedIds.has(m.id);
                 const isCompared = compareIds.has(m.id);
 
                 return `
-                    <div class="group bg-cardBg border border-cardBorder hover:border-accentBlue/60 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between">
+                    <article class="card card-enter group" style="animation-delay:${Math.min(idx, 11) * 45}ms">
                         <div>
-                            <div class="relative aspect-video bg-pitch overflow-hidden cursor-pointer modal-trigger" data-id="${m.id}">
+                            <div class="card__media modal-trigger" data-id="${m.id}" role="button" tabindex="0" aria-label="Inspect ${m.title.replace(/"/g, '&quot;')}">
+                                <span class="card__scan"></span>
                                 ${m.hasCad ? `
-                                    <canvas id="thumb-canvas-${m.id}" width="300" height="180" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></canvas>
-                                    <div class="absolute inset-0 bg-gradient-to-t from-pitch via-transparent to-transparent"></div>
-                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <div class="w-12 h-12 rounded-full bg-accentBlue/90 text-white flex items-center justify-center shadow-lg glow-blue-sm">
-                                            <i class="fa-solid fa-cube text-base"></i>
-                                        </div>
-                                    </div>
+                                    <canvas id="thumb-canvas-${m.id}" width="320" height="200"></canvas>
+                                    <span class="card__marker"><i class="fa-solid fa-cube" aria-hidden="true"></i></span>
                                 ` : m.youtubeId ? `
-                                    <img src="https://img.youtube.com/vi/${m.youtubeId}/hqdefault.jpg" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-pitch via-transparent to-transparent"></div>
-                                    <div class="absolute inset-0 flex items-center justify-center">
-                                        <div class="w-12 h-12 rounded-full bg-accentBlue/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform glow-blue-sm">
-                                            <i class="fa-solid fa-play text-sm ml-0.5"></i>
-                                        </div>
-                                    </div>
+                                    <img src="https://img.youtube.com/vi/${m.youtubeId}/hqdefault.jpg" alt="" loading="lazy">
+                                    <span class="card__marker"><i class="fa-solid fa-play ml-px" aria-hidden="true"></i></span>
                                 ` : `
-                                    <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-obsidian to-pitch text-pink-500 p-4">
-                                        <i class="fa-brands fa-instagram text-4xl mb-2"></i>
-                                        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Instagram Reel</span>
+                                    <div class="w-full h-full flex items-center justify-center bg-panel2 text-violet">
+                                        <i class="fa-brands fa-instagram text-2xl" aria-hidden="true"></i>
                                     </div>
+                                    <span class="card__marker"><i class="fa-solid fa-play ml-px" aria-hidden="true"></i></span>
                                 `}
 
-                                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-pitch/80 backdrop-blur-md text-accentBlue border border-cardBorder">
-                                        ${m.category}
-                                    </span>
-                                    ${m.hasCad ? `
-                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-accentBlue text-white shadow-sm flex items-center gap-1">
-                                            <i class="fa-solid fa-cube text-[9px]"></i> 3D CAD
-                                        </span>
-                                    ` : ''}
+                                <div class="absolute top-2.5 left-2.5 z-[3] flex flex-wrap gap-1.5">
+                                    <span class="tag">${m.category}</span>
+                                    ${m.hasCad ? `<span class="tag tag--teal">CAD</span>` : ''}
                                 </div>
                             </div>
 
-                            <div class="p-5 space-y-3">
-                                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
-                                    <span class="font-bold text-accentBlue truncate max-w-[160px]">${m.team}</span>
-                                    <span class="text-slate-400">${m.seasonKey}</span>
-                                </div>
-
-                                <h3 class="text-sm font-bold text-white line-clamp-2 leading-snug hover:text-accentBlue transition-colors cursor-pointer modal-trigger" data-id="${m.id}">
-                                    ${m.title}
-                                </h3>
-
-                                <div class="space-y-1 pt-1">
-                                    ${(m.specs || []).slice(0, 2).map(s => `
-                                        <div class="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
-                                            <i class="fa-solid fa-check text-[9px] text-accentBlue"></i>
-                                            <span>${s}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
+                            <div class="px-3.5 pt-3.5 pb-3">
+                                <h3 class="card__title line-clamp-2 cursor-pointer modal-trigger" data-id="${m.id}">${m.title}</h3>
+                                <p class="mt-1.5 text-[11.5px] text-ink3 truncate">${m.team}</p>
                             </div>
                         </div>
 
-                        <div class="px-5 py-3.5 bg-pitch/50 border-t border-cardBorder/80 flex items-center justify-between gap-2 text-xs">
-                            <button data-id="${m.id}" class="modal-trigger text-accentBlue font-bold hover:underline flex items-center gap-1 text-[11px]">
-                                <span>Inspect Specs</span>
-                                <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                            </button>
-
-                            <div class="flex items-center gap-1.5">
-                                <button data-id="${m.id}" class="compare-toggle-btn p-1.5 rounded-lg ${isCompared ? 'bg-accentBlue text-white' : 'bg-cardBg border border-cardBorder text-slate-400 hover:text-white'} transition-colors" title="Compare">
-                                    <i class="fa-solid fa-code-compare text-xs"></i>
+                        <div class="card__foot">
+                            <p class="num text-[11px] text-ink3 shrink-0">${m.seasonKey}</p>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button type="button" data-id="${m.id}" aria-pressed="${isCompared}" class="compare-toggle-btn card-act ${isCompared ? 'is-on' : ''}" aria-label="${isCompared ? 'Remove from comparison' : 'Add to comparison'}">
+                                    <i class="fa-solid fa-code-compare" aria-hidden="true"></i>
                                 </button>
-                                <button data-id="${m.id}" class="bookmark-toggle-btn p-1.5 rounded-lg ${isSaved ? 'bg-accentAmber/20 text-accentAmber border border-accentAmber/40' : 'bg-cardBg border border-cardBorder text-slate-400 hover:text-white'} transition-colors" title="Bookmark">
-                                    <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark text-xs"></i>
+                                <button type="button" data-id="${m.id}" aria-pressed="${isSaved}" class="bookmark-toggle-btn card-act ${isSaved ? 'is-saved' : ''}" aria-label="${isSaved ? 'Remove bookmark' : 'Save bookmark'}">
+                                    <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 `;
             }).join('');
 
@@ -1577,6 +2104,7 @@
                 btn.addEventListener('click', (e) => {
                     const id = e.currentTarget.getAttribute('data-id');
                     bookmarkedIds.has(id) ? bookmarkedIds.delete(id) : bookmarkedIds.add(id);
+                    saveBookmarks();
                     updateBookmarksBadge();
                     filterAndRenderGrid();
                 });
@@ -1624,34 +2152,35 @@
 
             if (selectedMechs.length < 2) {
                 compareContent.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-400">
-                        <i class="fa-solid fa-code-compare text-3xl text-accentBlue mb-3"></i>
-                        <h4 class="text-sm font-bold text-white mb-1">Select two mechanisms to compare</h4>
-                        <p class="text-xs">Use the compare icon on two mechanism cards, then open Compare again.</p>
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-center px-6">
+                        <i class="fa-solid fa-code-compare text-2xl text-signal mb-4" aria-hidden="true"></i>
+                        <h3 class="h3 text-ink mb-1.5">Pick two mechanisms</h3>
+                        <p class="text-[13px] text-ink2 max-w-sm leading-relaxed">Use the compare icon on two cards in the vault, then reopen this panel to see their BOMs and control logic side by side.</p>
                     </div>
                 `;
             } else {
                 compareContent.innerHTML = selectedMechs.map(m => `
-                    <article class="p-5 rounded-xl bg-pitch border border-cardBorder space-y-4">
+                    <article class="frame panel bg-void/50 p-5 space-y-5">
                         <div>
-                            <div class="text-[10px] font-mono font-bold text-accentBlue uppercase">${m.team}</div>
-                            <h4 class="text-base font-bold text-white mt-1">${m.title}</h4>
-                            <div class="text-[10px] text-slate-400 mt-1">${m.season} · ${m.category}</div>
+                            <div class="mono-label mono-label--signal text-[10px]">${m.team}</div>
+                            <h3 class="h3 text-ink mt-1.5 !text-[15px]">${m.title}</h3>
+                            <div class="mono-label text-[10px] mt-1.5">${m.season} · ${m.category}</div>
                         </div>
-                        <div>
-                            <div class="text-[10px] font-mono font-bold uppercase text-accentAmber mb-2">Hardware BOM</div>
-                            <ul class="space-y-1 text-xs text-slate-300 list-disc list-inside">
-                                ${(m.specs || []).map(spec => `<li>${spec}</li>`).join('') || '<li>No hardware details provided.</li>'}
+                        <div class="border-t border-line pt-4">
+                            <div class="mono-label text-[10px] mb-2.5" style="color:var(--amber)">Hardware BOM</div>
+                            <ul class="space-y-1.5 text-[13px] text-ink2 list-disc list-inside marker:text-signal">
+                                ${(m.specs || []).map(spec => `<li>${spec}</li>`).join('') || '<li class="list-none text-ink3">No hardware details provided.</li>'}
                             </ul>
                         </div>
-                        <div>
-                            <div class="text-[10px] font-mono font-bold uppercase text-accentBlue mb-2">Software Logic</div>
-                            <p class="text-xs text-slate-300 leading-relaxed">${m.software || 'No software notes provided.'}</p>
+                        <div class="border-t border-line pt-4">
+                            <div class="mono-label mono-label--signal text-[10px] mb-2.5">Software Logic</div>
+                            <p class="text-[13px] text-ink2 leading-relaxed">${m.software || 'No software notes provided.'}</p>
                         </div>
                     </article>
                 `).join('');
             }
 
+            rememberFocus();
             compareModal.classList.remove('hidden');
         }
 
@@ -1683,8 +2212,8 @@
             document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(pill => {
                 pill.addEventListener('click', (e) => {
                     activeCategory = e.currentTarget.getAttribute('data-category');
-                    document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(p => p.className = "cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-cardBg border border-cardBorder text-slate-300 hover:border-slate-500");
-                    e.currentTarget.className = "cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-accentBlue text-white shadow-md glow-blue-sm";
+                    document.querySelectorAll('#categoryPillGroup .cat-pill').forEach(p => p.className = "cat-pill pill");
+                    e.currentTarget.className = "cat-pill pill is-active";
                     filterAndRenderGrid();
                 });
             });
@@ -1708,7 +2237,14 @@
             // Global Delete Listener
             document.getElementById('deleteMechanismBtn').addEventListener('click', async () => {
                 if (!currentModalMech) return;
-                if (confirm(`Are you sure you want to globally delete "${currentModalMech.title}"?`)) {
+
+                const myUid = (auth && auth.currentUser) ? auth.currentUser.uid : null;
+                if (!myUid || currentModalMech.authorUid !== myUid) {
+                    alert('Only the team that submitted this mechanism can delete it.');
+                    return;
+                }
+
+                if (confirm(`Delete "${currentModalMech.title}"? This cannot be undone.`)) {
                     if (isFirebaseConnected) {
                         try {
                             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mechanisms', currentModalMech.id));
@@ -1726,29 +2262,24 @@
                 }
             });
 
-            document.getElementById('closeDetailModalBtn').addEventListener('click', () => {
-                document.getElementById('detailModal').classList.add('hidden');
-                if (animReq3d) cancelAnimationFrame(animReq3d);
-                document.getElementById('modal3dCanvasContainer').innerHTML = '';
-                document.getElementById('modalMediaContainer').innerHTML = '';
-            });
+            document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
 
             document.getElementById('tabMediaBtn').addEventListener('click', () => {
                 document.getElementById('modal3dCanvasContainer').classList.add('hidden');
                 document.getElementById('modalMediaContainer').classList.remove('hidden');
 
-                document.getElementById('tabMediaBtn').className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                document.getElementById('tabMediaBtn').className = "navtab is-active";
                 const tabCadBtn = document.getElementById('tabCadBtn');
-                if (tabCadBtn) tabCadBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+                if (tabCadBtn) tabCadBtn.className = "navtab";
             });
 
             document.getElementById('tabCadBtn').addEventListener('click', () => {
                 document.getElementById('modalMediaContainer').classList.add('hidden');
                 document.getElementById('modal3dCanvasContainer').classList.remove('hidden');
                 
-                document.getElementById('tabCadBtn').className = "px-3 py-2 border-b-2 border-accentBlue text-accentBlue font-bold flex items-center gap-2";
+                document.getElementById('tabCadBtn').className = "navtab is-active";
                 const tabMediaBtn = document.getElementById('tabMediaBtn');
-                if (tabMediaBtn) tabMediaBtn.className = "px-3 py-2 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2";
+                if (tabMediaBtn) tabMediaBtn.className = "navtab";
 
                 const container = document.getElementById('modal3dCanvasContainer');
                 
@@ -1764,7 +2295,7 @@
                         container.innerHTML = '';
                         const iframe = document.createElement('iframe');
                         iframe.src = embedUrl;
-                        iframe.className = 'w-full h-full border-0 rounded-xl';
+                        iframe.className = 'w-full h-full border-0 rounded-[6px]';
                         container.appendChild(iframe);
                         if (animReq3d) cancelAnimationFrame(animReq3d);
                     } else {
@@ -1775,10 +2306,10 @@
                     // Revert to 3D Viewport Structure if no direct URL to embed
                     container.innerHTML = `
                         <div id="threeJsViewport" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
-                        <div class="absolute bottom-3 left-3 bg-pitch/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-cardBorder text-[11px] font-mono flex items-center gap-3">
-                            <span class="text-slate-400"><i class="fa-solid fa-hand-pointer text-accentBlue"></i> Orbit: Drag | Zoom: Scroll</span>
-                            <button id="reset3dCameraBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-                            <button id="toggle3dWireframeBtn" class="hover:text-accentBlue font-bold text-slate-300"><i class="fa-solid fa-border-all"></i> Wireframe</button>
+                        <div class="absolute bottom-3 left-3 bg-void/85 backdrop-blur-md px-3 py-2 rounded-[5px] border border-line text-[11px] font-mono flex items-center gap-4">
+                            <span class="text-ink3">Drag to orbit · scroll to zoom</span>
+                            <button type="button" id="reset3dCameraBtn" class="text-ink2 hover:text-signal font-semibold transition-colors">Reset</button>
+                            <button type="button" id="toggle3dWireframeBtn" class="text-ink2 hover:text-signal font-semibold transition-colors">Wireframe</button>
                         </div>
                     `;
                     document.getElementById('reset3dCameraBtn').addEventListener('click', () => {
@@ -1794,23 +2325,22 @@
             });
 
             document.getElementById('openSubmitModalBtn').addEventListener('click', () => {
+                rememberFocus();
                 document.getElementById('submitModal').classList.remove('hidden');
             });
 
             document.getElementById('openCompareModalBtn').addEventListener('click', openCompareModal);
-            document.getElementById('closeCompareModalBtn').addEventListener('click', () => {
-                document.getElementById('compareModal').classList.add('hidden');
-            });
+            document.getElementById('closeCompareModalBtn').addEventListener('click', closeCompareModal);
 
-            document.getElementById('closeSubmitModalBtn').addEventListener('click', () => {
-                document.getElementById('submitModal').classList.add('hidden');
-            });
+            document.getElementById('closeSubmitModalBtn').addEventListener('click', closeSubmitModal);
 
             document.getElementById('submissionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const newMech = {
                     id: 'mech-user-' + Date.now(),
+                    authorUid: (auth && auth.currentUser) ? auth.currentUser.uid : null,
+                    createdAt: Date.now(),
                     team: document.getElementById('subTeam').value,
                     season: document.getElementById('subSeason').value,
                     seasonKey: document.getElementById('subSeason').value.match(/\(([^)]+)\)/)?.[1] || '2026-2027',
@@ -1851,20 +2381,20 @@
 
                 if (savedMechs.length === 0) {
                     list.innerHTML = `
-                        <div class="text-center py-12 text-slate-400 text-xs">
-                            <i class="fa-solid fa-bookmark text-2xl mb-2 text-slate-600 block"></i>
-                            No saved mechanisms yet. Click the bookmark icon on any card to save it here.
+                        <div class="text-center py-14 px-4">
+                            <i class="fa-regular fa-bookmark text-2xl text-ink3 block mb-3" aria-hidden="true"></i>
+                            <p class="text-[13px] text-ink2 leading-relaxed">Nothing saved yet. Use the bookmark icon on any mechanism card to keep it here.</p>
                         </div>
                     `;
                 } else {
                     list.innerHTML = savedMechs.map(m => `
-                        <div class="p-3 bg-pitch rounded-xl border border-cardBorder flex items-center justify-between gap-3 text-xs">
-                            <div>
-                                <div class="font-mono text-[10px] text-accentBlue font-bold">${m.team}</div>
-                                <div class="font-bold text-white truncate max-w-[200px]">${m.title}</div>
+                        <div class="panel bg-void/50 p-3 flex items-center justify-between gap-3 hover:border-signal/45 transition-colors">
+                            <div class="min-w-0">
+                                <div class="font-mono text-[10px] text-signal font-semibold truncate">${m.team}</div>
+                                <div class="text-[13px] font-semibold text-ink truncate">${m.title}</div>
                             </div>
-                            <button data-id="${m.id}" class="modal-trigger text-slate-400 hover:text-white p-1">
-                                <i class="fa-solid fa-arrow-right"></i>
+                            <button type="button" data-id="${m.id}" class="modal-trigger btn-icon !w-9 !h-9 shrink-0" aria-label="Open ${m.title.replace(/"/g, '&quot;')}">
+                                <i class="fa-solid fa-arrow-right text-[11px]" aria-hidden="true"></i>
                             </button>
                         </div>
                     `).join('');
@@ -1876,13 +2406,64 @@
                         });
                     });
                 }
+                rememberFocus();
                 drawer.classList.remove('translate-x-full');
             });
 
-            document.getElementById('closeBookmarksDrawerBtn').addEventListener('click', () => {
-                document.getElementById('bookmarksDrawer').classList.add('translate-x-full');
+            document.getElementById('closeBookmarksDrawerBtn').addEventListener('click', closeBookmarksDrawer);
+
+            // ---------- Keyboard & backdrop ----------
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (closeTopmostOverlay()) e.preventDefault();
+                    return;
+                }
+                // "/" focuses search — the kbd hint in the field promised this
+                if (e.key === '/' && currentView === 'vault') {
+                    const tag = (e.target.tagName || '').toLowerCase();
+                    if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+                    const input = document.getElementById('vaultSearchInput');
+                    if (input) { e.preventDefault(); input.focus(); input.select(); }
+                }
             });
 
+            [['detailModal', closeDetailModal], ['compareModal', closeCompareModal], ['submitModal', closeSubmitModal]]
+                .forEach(([id, close]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener('click', (e) => { if (e.target === el) close(); });
+                });
+
+            // ---------- Share link ----------
+            document.getElementById('modalCopyLinkBtn').addEventListener('click', async (e) => {
+                if (!currentModalMech) return;
+                const btn = e.currentTarget;
+                const url = mechanismShareUrl(currentModalMech.id);
+                const original = btn.innerHTML;
+                const ok = await copyToClipboard(url);
+                // No prompt() fallback — it is unsupported in some webviews and throws.
+                // The modal already puts ?m=<id> in the address bar, so that is the
+                // honest place to point people when the clipboard is unavailable.
+                btn.innerHTML = ok
+                    ? '<i class="fa-solid fa-check text-[12px]" aria-hidden="true"></i> Link copied'
+                    : '<i class="fa-solid fa-triangle-exclamation text-[12px]" aria-hidden="true"></i> Copy from address bar';
+                setTimeout(() => { btn.innerHTML = original; }, 2000);
+            });
+
+            // ---------- Save button in the detail modal ----------
+            document.getElementById('modalBookmarkToggleBtn').addEventListener('click', () => {
+                if (!currentModalMech) return;
+                const id = currentModalMech.id;
+                bookmarkedIds.has(id) ? bookmarkedIds.delete(id) : bookmarkedIds.add(id);
+                saveBookmarks();
+                updateBookmarksBadge();
+                filterAndRenderGrid();
+                syncModalBookmarkButton();
+            });
+
+            // Bookmarks now survive a reload, so the badge has to reflect them on load
+            updateBookmarksBadge();
+
+            applyUrlState();
             initFirebase();
         });
     </script>

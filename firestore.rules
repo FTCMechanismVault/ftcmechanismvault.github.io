@@ -1,0 +1,60 @@
+rules_version = '2';
+
+// FTC Mechanism Vault — Firestore security rules.
+//
+// The site hides the Delete button unless the current browser submitted the record,
+// but that is only a guard rail: anyone can open devtools and call deleteDoc()
+// directly. THESE RULES ARE WHAT ACTUALLY ENFORCE IT. Deploy them with:
+//
+//     firebase deploy --only firestore:rules
+//
+// or paste them into Firebase console → Firestore Database → Rules → Publish.
+//
+// Until they are published, the public collection is still world-writable.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Mechanisms (public archive) ----
+    match /artifacts/{appId}/public/data/mechanisms/{mechanismId} {
+
+      // The archive is meant to be read by anyone, signed in or not.
+      allow read: if true;
+
+      // Anyone signed in (anonymous auth counts) may submit, but the record must
+      // carry their own uid — you cannot create a document owned by someone else.
+      allow create: if request.auth != null
+                    && request.resource.data.authorUid == request.auth.uid;
+
+      // Only the submitter may edit their own record, and ownership cannot be
+      // reassigned in the process.
+      allow update: if request.auth != null
+                    && resource.data.authorUid == request.auth.uid
+                    && request.resource.data.authorUid == resource.data.authorUid;
+
+      // Only the submitter may delete their own record. Records with no authorUid
+      // — everything currently seeded — can never be deleted by a visitor.
+      allow delete: if request.auth != null
+                    && resource.data.authorUid is string
+                    && resource.data.authorUid == request.auth.uid;
+    }
+
+    // ---- Site analytics (the view counter) ----
+    // Read by everyone; incremented by any signed-in visitor on page load.
+    match /artifacts/{appId}/public/data/stats/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Anything not matched above is denied.
+  }
+}
+
+// NOTE ON SEEDING
+// ---------------
+// seedInitialData() in index.html writes the built-in sample mechanisms when the
+// collection is empty. Those records have no authorUid, so the create rule above
+// rejects them. That is deliberate: the live collection is not empty, and seed
+// records should not become deletable by whichever visitor happens to trigger the
+// seed. If you ever do want to reseed, do it from the Firebase console or a script
+// using the Admin SDK, which bypasses these rules.
