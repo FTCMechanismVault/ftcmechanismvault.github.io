@@ -1,0 +1,4 @@
+# Firebase CLI noise
+firebase-debug.log
+firebase-debug.*.log
+.firebase/

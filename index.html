@@ -342,6 +342,17 @@
         .field:focus { border-color: var(--signal); background: var(--panel-2); }
         select.field { cursor: pointer; }
 
+        .file-field { padding: 7px 10px; font-size: 12px; cursor: pointer; }
+        .file-field::file-selector-button {
+            font: inherit; font-weight: 600;
+            margin-right: 10px; padding: 5px 10px;
+            border: 1px solid var(--line); border-radius: var(--r-sm);
+            background: var(--panel-2); color: var(--ink);
+            cursor: pointer;
+            transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+        }
+        .file-field::file-selector-button:hover { color: var(--signal); border-color: var(--signal); }
+
         .field-label {
             display: block;
             font-family: 'JetBrains Mono', monospace;
@@ -620,36 +631,17 @@
                         </p>
                     </div>
 
-                    <!-- Hero visual: one filled-in record, shown the way the vault shows it -->
+                    <!-- Hero visual: a photograph, captioned only with what is actually
+                         known about it. No invented team number, title or specs. -->
                     <div class="lg:col-span-5 flex justify-center lg:justify-end">
-                        <figure class="spec-card frame w-full max-w-[400px]" aria-hidden="true">
+                        <figure class="spec-card frame w-full max-w-[400px]">
                             <div class="relative aspect-[16/10] overflow-hidden bg-void">
-                                <img src="hero-robot.webp" alt="" width="983" height="636" class="w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-t from-panel via-panel/25 to-transparent"></div>
-                                <span class="tag tag--signal absolute top-3 left-3">3D CAD + Video</span>
+                                <img src="hero-robot.webp" alt="An FTC competition robot, showing its intake rollers, drivetrain and scoring mechanism."
+                                     width="983" height="636" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-panel/70 via-transparent to-transparent"></div>
                             </div>
-
-                            <figcaption class="p-4 space-y-3">
-                                <div>
-                                    <p class="text-[11px] font-mono text-signal">Launcher subsystem</p>
-                                    <p class="text-[15px] font-semibold text-ink mt-1" style="font-family:var(--font-display)">Tensioned Catapult Launcher</p>
-                                    <p class="text-[12px] text-ink3 mt-1">FTC #11115 Gluten Free<span class="sep mx-1.5">·</span><span class="num">2025-2026</span></p>
-                                </div>
-
-                                <dl class="border-t border-line pt-3 space-y-1.5 text-[12px]">
-                                    <div class="flex gap-3">
-                                        <dt class="w-16 shrink-0 text-ink3">Drive</dt>
-                                        <dd class="text-ink2 truncate">goBILDA 1150 RPM Yellowjacket</dd>
-                                    </div>
-                                    <div class="flex gap-3">
-                                        <dt class="w-16 shrink-0 text-ink3">Release</dt>
-                                        <dd class="text-ink2 truncate">Axon Micro servo, 180°</dd>
-                                    </div>
-                                    <div class="flex gap-3">
-                                        <dt class="w-16 shrink-0 text-ink3">Control</dt>
-                                        <dd class="text-ink2 truncate">Velocity PIDF, auto-align</dd>
-                                    </div>
-                                </dl>
+                            <figcaption class="px-4 py-3 border-t border-line text-[12px] text-ink3">
+                                Every mechanism in the vault is documented like this one — CAD, video and parts, together.
                             </figcaption>
                         </figure>
                     </div>
@@ -796,7 +788,7 @@
                     <div class="flex items-center gap-5">
                         <label for="cadOnlyToggle" class="flex items-center gap-2 cursor-pointer text-[13px] text-ink2 hover:text-ink transition-colors">
                             <input type="checkbox" id="cadOnlyToggle" class="w-4 h-4 rounded-[3px] bg-panel border border-line accent-signal cursor-pointer">
-                            <span>3D CAD only</span>
+                            <span>Has CAD</span>
                         </label>
                         <p class="text-[13px] text-ink3"><span id="resultsCount" class="num text-ink">0</span> results</p>
                     </div>
@@ -1010,14 +1002,10 @@
                         </select>
                     </div>
                     <div>
-                        <label for="subCad3dType" class="field-label">3D CAD Preset Model</label>
-                        <select id="subCad3dType" class="field">
-                            <option value="NONE">No 3D CAD preset</option>
-                            <option value="ELEVATOR">Viper Slide Linear Elevator</option>
-                            <option value="CATAPULT">Tensioned Catapult Launcher</option>
-                            <option value="SPINTAKE">Active Spintake Roller</option>
-                            <option value="CLAW">Articulated Servo Claw</option>
-                        </select>
+                        <label for="subModelFile" class="field-label">3D model file</label>
+                        <input type="file" id="subModelFile" accept=".glb,.gltf,.obj,.stl,model/gltf-binary,model/gltf+json"
+                               class="field file-field">
+                        <p class="text-[11px] text-ink3 mt-1.5">.glb, .gltf, .obj or .stl — max 25&nbsp;MB.</p>
                     </div>
                 </div>
 
@@ -1033,6 +1021,14 @@
                         <p class="text-[11px] text-ink3 mt-1.5">Public document link.</p>
                     </div>
                 </div>
+
+                <div>
+                    <label for="subModelUrl" class="field-label">…or link an existing 3D model file</label>
+                    <input type="url" id="subModelUrl" placeholder="https://…/mechanism.glb" class="field">
+                    <p class="text-[11px] text-ink3 mt-1.5">Direct link to a .glb/.gltf/.obj/.stl file. The host must allow cross-origin requests.</p>
+                </div>
+
+                <p id="subUploadStatus" class="hidden text-[12px] text-ink2 font-mono"></p>
 
                 <div>
                     <label for="subHardware" class="field-label">Components / BOM</label>
@@ -1069,6 +1065,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, runTransaction, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ftc-mechanism-vault-prod';
         
@@ -1081,7 +1078,7 @@
             appId: "1:133452112607:web:16622a953b5f75dee6ff6a"
         };
 
-        let app, auth, db;
+        let app, auth, db, storage;
         let isFirebaseConnected = false;
 
         const initialMechanisms = [
@@ -1304,19 +1301,6 @@
         let isWireframe3d = false;
 
         // --- Helper to determine effective 3D CAD type based on link or type ---
-        function getEffectiveCadType(mech) {
-            if (!mech) return 'SPINTAKE';
-            if (mech.cad3dType && mech.cad3dType !== 'NONE') return mech.cad3dType;
-            
-            const url = (mech.cadUrl || mech.mediaUrl || '').toLowerCase();
-            const title = (mech.title || '').toLowerCase();
-
-            if (url.includes('elevator') || title.includes('elevator') || title.includes('slide') || title.includes('lift')) return 'ELEVATOR';
-            if (url.includes('catapult') || title.includes('catapult') || title.includes('launcher') || title.includes('shooter')) return 'CATAPULT';
-            if (url.includes('claw') || title.includes('claw') || title.includes('wrist') || title.includes('grabber')) return 'CLAW';
-            return 'SPINTAKE';
-        }
-
         function hasValidMedia(mech) {
             if (!mech) return false;
             if (mech.youtubeId) return true;
@@ -1332,232 +1316,214 @@
             }
         }
 
+        // --- CAD source helpers -------------------------------------------------
         function getCadFileType(cadUrl) {
+            if (!cadUrl) return '';
+            let path = String(cadUrl).toLowerCase();
             try {
-                const path = new URL(cadUrl).pathname.toLowerCase();
-                if (path.endsWith('.glb') || path.endsWith('.gltf')) return 'gltf';
-                if (path.endsWith('.obj')) return 'obj';
-                if (path.endsWith('.stl')) return 'stl';
+                // Firebase download URLs carry the filename in the path before ?alt=media
+                path = decodeURIComponent(new URL(cadUrl).pathname.toLowerCase());
             } catch (error) {
-                return '';
+                path = path.split('?')[0];
             }
+            if (path.endsWith('.glb') || path.endsWith('.gltf')) return 'gltf';
+            if (path.endsWith('.obj')) return 'obj';
+            if (path.endsWith('.stl')) return 'stl';
             return '';
         }
 
-        function loadCadFile(container, cadUrl, fileType) {
-            const loading = document.createElement('div');
-            loading.className = 'absolute inset-0 flex items-center justify-center text-xs text-ink3 font-mono';
-            loading.innerText = 'Loading CAD file...';
-            container.appendChild(loading);
-
-            const addModel = (model) => {
-                loading.remove();
-                const object = model.scene || model;
-                object.traverse((child) => {
-                    if (child.isMesh) child.material = new THREE.MeshStandardMaterial({ color: 0xff7a2f, metalness: 0.45, roughness: 0.3 });
-                });
-                const box = new THREE.Box3().setFromObject(object);
-                const size = box.getSize(new THREE.Vector3());
-                const center = box.getCenter(new THREE.Vector3());
-                const scale = 3 / Math.max(size.x, size.y, size.z, 0.001);
-                object.position.sub(center).multiplyScalar(scale);
-                object.scale.setScalar(scale);
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x08090c);
-                const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 1000);
-                camera.position.set(4, 3, 5);
-                const renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                container.appendChild(renderer.domElement);
-                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-                const light = new THREE.DirectionalLight(0x2dd4bf, 1.2);
-                light.position.set(5, 8, 5);
-                scene.add(light, object);
-                const animate = () => {
-                    animReq3d = requestAnimationFrame(animate);
-                    object.rotation.y += 0.006;
-                    renderer.render(scene, camera);
-                };
-                animate();
-            };
-
-            const onError = () => {
-                loading.innerText = 'CAD file could not be loaded. Use Launch CAD to open the source file.';
-            };
-            if (fileType === 'gltf' && THREE.GLTFLoader) new THREE.GLTFLoader().load(cadUrl, addModel, undefined, onError);
-            else if (fileType === 'obj' && THREE.OBJLoader) new THREE.OBJLoader().load(cadUrl, addModel, undefined, onError);
-            else if (fileType === 'stl' && THREE.STLLoader) new THREE.STLLoader().load(cadUrl, (geometry) => addModel(new THREE.Mesh(geometry)), undefined, onError);
-            else loading.innerText = 'This CAD format opens from the source link below.';
+        // A record has a renderable model only when real geometry is attached.
+        // An Onshape link is a web app, not a mesh, so it is not a model.
+        function hasCadModel(mech) {
+            return !!(mech && mech.modelUrl && (mech.modelFormat || getCadFileType(mech.modelUrl)));
         }
 
-        // --- 3D WebGL Viewer Logic ---
-        function init3dViewer(containerId, cadType = 'SPINTAKE') {
-            const container = document.getElementById(containerId);
-            if (!container) return;
+        function isOnshapeUrl(url) {
+            return !!url && String(url).toLowerCase().includes('onshape.com');
+        }
 
-            // Clean up existing scene/animation frame
+        // The 3D tab is offered only when there is something real to show.
+        function cadTabAvailable(mech) {
+            return hasCadModel(mech) || (mech && isOnshapeUrl(mech.cadUrl));
+        }
+
+        // --- Model loading ------------------------------------------------------
+        const cadObjectCache = new Map();
+
+        function loadCadObject(url, format) {
+            const key = url;
+            if (cadObjectCache.has(key)) return cadObjectCache.get(key);
+
+            const promise = new Promise((resolve, reject) => {
+                const fmt = format || getCadFileType(url);
+                const fail = (err) => reject(err || new Error('load failed'));
+                if (fmt === 'gltf' && THREE.GLTFLoader) {
+                    new THREE.GLTFLoader().load(url, (g) => resolve(g.scene), undefined, fail);
+                } else if (fmt === 'obj' && THREE.OBJLoader) {
+                    new THREE.OBJLoader().load(url, (o) => resolve(o), undefined, fail);
+                } else if (fmt === 'stl' && THREE.STLLoader) {
+                    new THREE.STLLoader().load(url, (geo) => {
+                        geo.computeVertexNormals();
+                        resolve(new THREE.Mesh(geo, new THREE.MeshStandardMaterial()));
+                    }, undefined, fail);
+                } else {
+                    reject(new Error('Unsupported CAD format: ' + fmt));
+                }
+            });
+
+            cadObjectCache.set(key, promise);
+            promise.catch(() => cadObjectCache.delete(key));
+            return promise;
+        }
+
+        // Re-materialise in the site palette, then scale and centre on the origin so
+        // any model — millimetres or metres — frames the same way.
+        function normalizeCadObject(object, targetSize) {
+            object.traverse((child) => {
+                if (child.isMesh) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: 0xff7a2f, metalness: 0.35, roughness: 0.4
+                    });
+                }
+            });
+            const box = new THREE.Box3().setFromObject(object);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+            const scale = targetSize / Math.max(size.x, size.y, size.z, 0.0001);
+            object.scale.setScalar(scale);
+            object.position.copy(center).multiplyScalar(-scale);
+            return object;
+        }
+
+        function applyWireframe(object, on) {
+            if (!object) return;
+            object.traverse((child) => {
+                if (child.isMesh && child.material) child.material.wireframe = !!on;
+            });
+        }
+
+        // --- Interactive viewer (modal) ----------------------------------------
+        function disposeCadViewer() {
             if (animReq3d) cancelAnimationFrame(animReq3d);
+            animReq3d = null;
+            if (controls3d && controls3d.dispose) { try { controls3d.dispose(); } catch (e) {} }
+            if (renderer3d && renderer3d.dispose) { try { renderer3d.dispose(); } catch (e) {} }
+            controls3d = null;
+            renderer3d = null;
+            currentMesh3d = null;
+        }
+
+        function initCadViewer(containerId, mech) {
+            const container = document.getElementById(containerId);
+            if (!container || !mech) return;
+
+            disposeCadViewer();
             container.innerHTML = '';
 
             const width = container.clientWidth || 600;
             const height = container.clientHeight || 340;
 
-            // Scene & Camera
             scene3d = new THREE.Scene();
             scene3d.background = new THREE.Color(0x08090c);
 
-            camera3d = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera3d = new THREE.PerspectiveCamera(45, width / height, 0.01, 2000);
             camera3d.position.set(4, 3, 5);
 
-            // Renderer
             renderer3d = new THREE.WebGLRenderer({ antialias: true });
+            renderer3d.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer3d.setSize(width, height);
-            renderer3d.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer3d.domElement);
 
-            // Orbit Controls
             if (typeof THREE.OrbitControls !== 'undefined') {
                 controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
                 controls3d.enableDamping = true;
                 controls3d.dampingFactor = 0.05;
             }
 
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene3d.add(ambientLight);
+            scene3d.add(new THREE.AmbientLight(0xffffff, 0.75));
+            const keyLight = new THREE.DirectionalLight(0xff7a2f, 1.15);
+            keyLight.position.set(5, 10, 7);
+            const fillLight = new THREE.DirectionalLight(0x2dd4bf, 0.75);
+            fillLight.position.set(-6, 4, -5);
+            scene3d.add(keyLight, fillLight);
 
-            const dirLight1 = new THREE.DirectionalLight(0xff7a2f, 1.2);
-            dirLight1.position.set(5, 10, 7);
-            scene3d.add(dirLight1);
+            const grid = new THREE.GridHelper(10, 20, 0xff7a2f, 0x24282f);
+            grid.position.y = -1.8;
+            scene3d.add(grid);
 
-            const dirLight2 = new THREE.DirectionalLight(0x2dd4bf, 0.8);
-            dirLight2.position.set(-5, -5, -5);
-            scene3d.add(dirLight2);
+            const status = document.createElement('div');
+            status.className = 'absolute inset-0 flex items-center justify-center text-xs text-ink3 font-mono pointer-events-none px-6 text-center';
+            status.innerText = 'Loading CAD model…';
+            container.appendChild(status);
 
-            // Grid Floor
-            const gridHelper = new THREE.GridHelper(10, 20, 0xff7a2f, 0x24282f);
-            gridHelper.position.y = -1;
-            scene3d.add(gridHelper);
-
-            // Create 3D Parametric CAD Geometry Preset
-            const group = new THREE.Group();
-            const material = new THREE.MeshStandardMaterial({
-                color: 0xff7a2f,
-                metalness: 0.5,
-                roughness: 0.2,
-                wireframe: isWireframe3d
-            });
-
-            if (cadType === 'ELEVATOR') {
-                const railGeo = new THREE.BoxGeometry(0.2, 3, 0.2);
-                const rail1 = new THREE.Mesh(railGeo, material); rail1.position.x = -0.8;
-                const rail2 = new THREE.Mesh(railGeo, material); rail2.position.x = 0.8;
-                const carGeo = new THREE.BoxGeometry(1.4, 0.6, 0.4);
-                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xfbbf24, wireframe: isWireframe3d }));
-                carriage.position.y = 0.5;
-                group.add(rail1, rail2, carriage);
-            } else if (cadType === 'CATAPULT') {
-                const baseGeo = new THREE.BoxGeometry(2, 0.2, 1.5);
-                const base = new THREE.Mesh(baseGeo, material);
-                const armGeo = new THREE.CylinderGeometry(0.08, 0.08, 2.5);
-                const arm = new THREE.Mesh(armGeo, material);
-                arm.rotation.z = -Math.PI / 4;
-                arm.position.set(0.5, 0.8, 0);
-                group.add(base, arm);
-            } else if (cadType === 'CLAW') {
-                const wristGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-                const wrist = new THREE.Mesh(wristGeo, material);
-                const fingerGeo = new THREE.BoxGeometry(0.15, 1.2, 0.2);
-                const f1 = new THREE.Mesh(fingerGeo, material); f1.position.set(-0.3, 0.8, 0.3); f1.rotation.z = -0.2;
-                const f2 = new THREE.Mesh(fingerGeo, material); f2.position.set(0.3, 0.8, 0.3); f2.rotation.z = 0.2;
-                group.add(wrist, f1, f2);
-            } else {
-                const shaftGeo = new THREE.CylinderGeometry(0.15, 0.15, 3, 32);
-                const shaft = new THREE.Mesh(shaftGeo, material);
-                shaft.rotation.z = Math.PI / 2;
-                for (let i = -1; i <= 1; i += 0.5) {
-                    const wheelGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 24);
-                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x34d399, wireframe: isWireframe3d });
-                    const wheel = new THREE.Mesh(wheelGeo, wheelMat);
-                    wheel.rotation.z = Math.PI / 2;
-                    wheel.position.x = i;
-                    group.add(wheel);
-                }
-                group.add(shaft);
-            }
-
-            currentMesh3d = group;
-            scene3d.add(currentMesh3d);
-
-            function animate() {
+            const animate = () => {
                 animReq3d = requestAnimationFrame(animate);
-                if (currentMesh3d) currentMesh3d.rotation.y += 0.008;
                 if (controls3d) controls3d.update();
                 renderer3d.render(scene3d, camera3d);
-            }
+            };
             animate();
+
+            loadCadObject(mech.modelUrl, mech.modelFormat).then((object) => {
+                status.remove();
+                currentMesh3d = normalizeCadObject(object.clone(true), 3.2);
+                applyWireframe(currentMesh3d, isWireframe3d);
+                scene3d.add(currentMesh3d);
+            }).catch(() => {
+                status.innerText = 'This model could not be loaded. Use Open CAD file below.';
+            });
         }
 
-        function renderCadThumbnailCanvas(canvas, cadType) {
-            const width = canvas.width || 300;
-            const height = canvas.height || 180;
+        // --- Grid thumbnails ----------------------------------------------------
+        // Every card sharing one WebGL context: browsers cap concurrent contexts at
+        // around 16, so a renderer per card would blank out a full grid.
+        let thumbRenderer = null;
 
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x101217);
-
-            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-            camera.position.set(3.5, 2.5, 4);
-            camera.lookAt(0, 0, 0);
-
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-            renderer.setSize(width, height, false);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xff7a2f, 1.2);
-            dirLight.position.set(5, 8, 5);
-            scene.add(dirLight);
-
-            const gridHelper = new THREE.GridHelper(8, 12, 0xff7a2f, 0x24282f);
-            gridHelper.position.y = -1;
-            scene.add(gridHelper);
-
-            const group = new THREE.Group();
-            const material = new THREE.MeshStandardMaterial({ color: 0xff7a2f, metalness: 0.4, roughness: 0.3 });
-
-            if (cadType === 'ELEVATOR') {
-                const railGeo = new THREE.BoxGeometry(0.2, 2.5, 0.2);
-                const r1 = new THREE.Mesh(railGeo, material); r1.position.x = -0.6;
-                const r2 = new THREE.Mesh(railGeo, material); r2.position.x = 0.6;
-                const carGeo = new THREE.BoxGeometry(1.1, 0.5, 0.3);
-                const carriage = new THREE.Mesh(carGeo, new THREE.MeshStandardMaterial({ color: 0xfbbf24 }));
-                group.add(r1, r2, carriage);
-            } else if (cadType === 'CATAPULT') {
-                const base = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.2, 1.2), material);
-                const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2), material);
-                arm.rotation.z = -Math.PI / 4;
-                arm.position.set(0.3, 0.6, 0);
-                group.add(base, arm);
-            } else if (cadType === 'CLAW') {
-                const wrist = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), material);
-                const f1 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1, 0.18), material); f1.position.set(-0.25, 0.6, 0.2); f1.rotation.z = -0.2;
-                const f2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1, 0.18), material); f2.position.set(0.25, 0.6, 0.2); f2.rotation.z = 0.2;
-                group.add(wrist, f1, f2);
-            } else {
-                const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.5, 16), material);
-                shaft.rotation.z = Math.PI / 2;
-                for (let i = -0.8; i <= 0.8; i += 0.5) {
-                    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 16), new THREE.MeshStandardMaterial({ color: 0x34d399 }));
-                    wheel.rotation.z = Math.PI / 2;
-                    wheel.position.x = i;
-                    group.add(wheel);
+        function getThumbRenderer(width, height) {
+            if (!thumbRenderer) {
+                try {
+                    thumbRenderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+                } catch (e) {
+                    return null;
                 }
-                group.add(shaft);
             }
+            thumbRenderer.setPixelRatio(1);
+            thumbRenderer.setSize(width, height, false);
+            return thumbRenderer;
+        }
 
-            group.rotation.y = 0.5;
-            scene.add(group);
-            renderer.render(scene, camera);
+        function renderCadThumbnail(canvas, mech) {
+            if (!canvas || !hasCadModel(mech)) return;
+            const width = canvas.width || 320;
+            const height = canvas.height || 200;
+
+            loadCadObject(mech.modelUrl, mech.modelFormat).then((object) => {
+                const renderer = getThumbRenderer(width, height);
+                if (!renderer) return;
+
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x101217);
+
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.01, 2000);
+                camera.position.set(3.4, 2.4, 4);
+                camera.lookAt(0, 0, 0);
+
+                scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+                const dir = new THREE.DirectionalLight(0xff7a2f, 1.2);
+                dir.position.set(5, 8, 5);
+                scene.add(dir);
+
+                const grid = new THREE.GridHelper(8, 12, 0xff7a2f, 0x24282f);
+                grid.position.y = -1.4;
+                scene.add(grid);
+
+                scene.add(normalizeCadObject(object.clone(true), 2.8));
+                renderer.render(scene, camera);
+
+                const ctx = canvas.getContext('2d');
+                if (ctx) ctx.drawImage(renderer.domElement, 0, 0, width, height);
+            }).catch(() => {
+                // Leave the card's fallback visual alone rather than drawing a fake model
+            });
         }
 
         // ---------- URL state (shareable links) ----------
@@ -1572,8 +1538,14 @@
             return params;
         }
 
+        const OWNED_URL_KEYS = ['m', 'view', 'season', 'cat', 'cad', 'q'];
+
         function syncUrl() {
-            const params = buildStateParams(true);
+            // Rewrite only the keys this app owns, so campaign tags and anything else
+            // a visitor arrived with survive the first render.
+            const params = new URLSearchParams(location.search);
+            OWNED_URL_KEYS.forEach(k => params.delete(k));
+            buildStateParams(true).forEach((value, key) => params.set(key, value));
             const qs = params.toString();
             const url = location.pathname + (qs ? '?' + qs : '') + location.hash;
             try {
@@ -1684,7 +1656,7 @@
 
         function closeDetailModal() {
             document.getElementById('detailModal').classList.add('hidden');
-            if (animReq3d) cancelAnimationFrame(animReq3d);
+            disposeCadViewer();
             // Clearing the containers stops the autoplaying video and the WebGL loop
             document.getElementById('modal3dCanvasContainer').innerHTML = '';
             document.getElementById('modalMediaContainer').innerHTML = '';
@@ -1755,6 +1727,12 @@
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+                try {
+                    storage = getStorage(app);
+                } catch (e) {
+                    // Storage not enabled on the project — uploads degrade to the URL field
+                    storage = null;
+                }
 
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -1948,7 +1926,19 @@
                 document.getElementById('modalMediaContainer').innerHTML = '';
             }
 
-            if (m.hasCad) {
+            // A record can have neither playable media nor a viewable model. Say so
+            // rather than leaving an unexplained black rectangle.
+            if (!hasMedia && !cadTabAvailable(m)) {
+                document.getElementById('modalMediaContainer').innerHTML = `
+                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center bg-panel2">
+                        <i class="fa-regular fa-image text-xl text-ink3" aria-hidden="true"></i>
+                        <p class="text-[13px] text-ink2">No preview available for this mechanism.</p>
+                        <p class="text-[12px] text-ink3">The specs below are the full record${m.cadUrl ? ', or open the source CAD file' : ''}.</p>
+                    </div>
+                `;
+            }
+
+            if (cadTabAvailable(m)) {
                 tabCadBtn.classList.remove('hidden');
                 tabCadBtn.style.display = 'flex';
             } else {
@@ -1981,12 +1971,15 @@
                 document.getElementById('modal3dCanvasContainer').classList.add('hidden');
                 tabMediaBtn.className = "navtab is-active";
                 tabCadBtn.className = "navtab";
-            } else if (m.hasCad) {
+            } else if (cadTabAvailable(m)) {
                 document.getElementById('modalMediaContainer').classList.add('hidden');
                 document.getElementById('modal3dCanvasContainer').classList.remove('hidden');
                 tabCadBtn.className = "navtab is-active";
                 tabMediaBtn.className = "navtab";
                 setTimeout(() => document.getElementById('tabCadBtn').click(), 10); // Automatically build CAD view
+            } else {
+                document.getElementById('modalMediaContainer').classList.remove('hidden');
+                document.getElementById('modal3dCanvasContainer').classList.add('hidden');
             }
 
             rememberFocus();
@@ -2047,7 +2040,7 @@
                         <div>
                             <div class="card__media modal-trigger" data-id="${m.id}" role="button" tabindex="0" aria-label="Inspect ${m.title.replace(/"/g, '&quot;')}">
                                 <span class="card__scan"></span>
-                                ${m.hasCad ? `
+                                ${hasCadModel(m) ? `
                                     <canvas id="thumb-canvas-${m.id}" width="320" height="200"></canvas>
                                     <span class="card__marker"><i class="fa-solid fa-cube" aria-hidden="true"></i></span>
                                 ` : m.youtubeId ? `
@@ -2062,7 +2055,7 @@
 
                                 <div class="absolute top-2.5 left-2.5 z-[3] flex flex-wrap gap-1.5">
                                     <span class="tag">${m.category}</span>
-                                    ${m.hasCad ? `<span class="tag tag--teal">CAD</span>` : ''}
+                                    ${hasCadModel(m) ? `<span class="tag tag--teal">3D</span>` : m.hasCad ? `<span class="tag tag--teal">CAD</span>` : ''}
                                 </div>
                             </div>
 
@@ -2089,9 +2082,9 @@
 
             // Render 3D previews for CAD thumbnails
             setTimeout(() => {
-                filtered.filter(m => m.hasCad).forEach(m => {
+                filtered.filter(hasCadModel).forEach(m => {
                     const canvas = document.getElementById(`thumb-canvas-${m.id}`);
-                    if (canvas) renderCadThumbnailCanvas(canvas, getEffectiveCadType(m));
+                    if (canvas) renderCadThumbnail(canvas, m);
                 });
             }, 50);
 
@@ -2282,28 +2275,10 @@
                 if (tabMediaBtn) tabMediaBtn.className = "navtab";
 
                 const container = document.getElementById('modal3dCanvasContainer');
-                
-                // If a valid CAD URL is available, embed it natively using an iframe
-                if (currentModalMech && currentModalMech.hasCad && currentModalMech.cadUrl && currentModalMech.cadUrl.includes('http')) {
-                    let embedUrl = currentModalMech.cadUrl;
-                    const cadFileType = getCadFileType(embedUrl);
-                    if (cadFileType) {
-                        container.innerHTML = '';
-                        loadCadFile(container, embedUrl, cadFileType);
-                    } else if (embedUrl.includes('onshape.com') && !embedUrl.includes('iframewindow=true')) {
-                        embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'iframewindow=true';
-                        container.innerHTML = '';
-                        const iframe = document.createElement('iframe');
-                        iframe.src = embedUrl;
-                        iframe.className = 'w-full h-full border-0 rounded-[6px]';
-                        container.appendChild(iframe);
-                        if (animReq3d) cancelAnimationFrame(animReq3d);
-                    } else {
-                        container.innerHTML = '';
-                        loadCadFile(container, embedUrl, cadFileType);
-                    }
-                } else {
-                    // Revert to 3D Viewport Structure if no direct URL to embed
+                container.innerHTML = '';
+                disposeCadViewer();
+
+                if (hasCadModel(currentModalMech)) {
                     container.innerHTML = `
                         <div id="threeJsViewport" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
                         <div class="absolute bottom-3 left-3 bg-void/85 backdrop-blur-md px-3 py-2 rounded-[5px] border border-line text-[11px] font-mono flex items-center gap-4">
@@ -2317,10 +2292,29 @@
                     });
                     document.getElementById('toggle3dWireframeBtn').addEventListener('click', () => {
                         isWireframe3d = !isWireframe3d;
-                        if (currentModalMech) init3dViewer('threeJsViewport', getEffectiveCadType(currentModalMech));
+                        applyWireframe(currentMesh3d, isWireframe3d);
                     });
+                    setTimeout(() => initCadViewer('threeJsViewport', currentModalMech), 50);
 
-                    setTimeout(() => init3dViewer('threeJsViewport', getEffectiveCadType(currentModalMech)), 50);
+                } else if (currentModalMech && isOnshapeUrl(currentModalMech.cadUrl)) {
+                    let embedUrl = currentModalMech.cadUrl;
+                    if (!embedUrl.includes('iframewindow=true')) {
+                        embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'iframewindow=true';
+                    }
+                    const iframe = document.createElement('iframe');
+                    iframe.src = embedUrl;
+                    iframe.className = 'w-full h-full border-0 rounded-[6px]';
+                    iframe.setAttribute('title', 'Onshape CAD document');
+                    container.appendChild(iframe);
+
+                } else {
+                    container.innerHTML = `
+                        <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+                            <i class="fa-solid fa-cube text-xl text-ink3" aria-hidden="true"></i>
+                            <p class="text-[13px] text-ink2">No 3D model attached to this mechanism.</p>
+                            <p class="text-[12px] text-ink3">Use Open CAD file below, or submit a .glb/.obj/.stl to show it here.</p>
+                        </div>
+                    `;
                 }
             });
 
@@ -2346,9 +2340,9 @@
                     seasonKey: document.getElementById('subSeason').value.match(/\(([^)]+)\)/)?.[1] || '2026-2027',
                     title: document.getElementById('subTitle').value,
                     category: document.getElementById('subCategory').value,
-                    cad3dType: document.getElementById('subCad3dType').value,
+
                     mediaUrl: document.getElementById('subVideoUrl').value.trim(),
-                    hasCad: !!document.getElementById('subCadUrl').value.trim() || document.getElementById('subCad3dType').value !== 'NONE',
+                    hasCad: false,
                     cadUrl: document.getElementById('subCadUrl').value || '',
                     specs: document.getElementById('subHardware').value.split(',').map(s => s.trim()).filter(Boolean),
                     software: document.getElementById('subSoftware').value || 'Standard TeleOp / Autonomous driving control.'
@@ -2356,6 +2350,68 @@
 
                 const ytMatch = newMech.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                 newMech.youtubeId = ytMatch ? ytMatch[1] : '';
+
+                // ---- Attach real geometry: uploaded file first, else a linked model ----
+                const submitBtn = document.getElementById('submitFormBtn');
+                const statusEl = document.getElementById('subUploadStatus');
+                const fileInput = document.getElementById('subModelFile');
+                const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+                const showStatus = (text, tone) => {
+                    statusEl.classList.remove('hidden');
+                    statusEl.style.color = tone === 'error' ? '#FB7185' : '';
+                    statusEl.innerText = text;
+                };
+
+                let modelUrl = document.getElementById('subModelUrl').value.trim();
+                let modelFormat = modelUrl ? getCadFileType(modelUrl) : '';
+
+                if (modelUrl && !modelFormat) {
+                    showStatus('That model link is not a .glb, .gltf, .obj or .stl file.', 'error');
+                    return;
+                }
+
+                if (file) {
+                    const ext = (file.name.split('.').pop() || '').toLowerCase();
+                    const fmt = ext === 'glb' || ext === 'gltf' ? 'gltf' : (ext === 'obj' ? 'obj' : (ext === 'stl' ? 'stl' : ''));
+                    if (!fmt) {
+                        showStatus('Unsupported file type. Use .glb, .gltf, .obj or .stl.', 'error');
+                        return;
+                    }
+                    if (file.size > 25 * 1024 * 1024) {
+                        showStatus('That file is over the 25 MB limit.', 'error');
+                        return;
+                    }
+                    if (!storage) {
+                        showStatus('File uploads are unavailable — paste a direct model link instead.', 'error');
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    try {
+                        const path = `cad-models/${newMech.id}.${ext}`;
+                        const task = uploadBytesResumable(storageRef(storage, path), file);
+                        await new Promise((resolve, reject) => {
+                            task.on('state_changed',
+                                (snap) => showStatus('Uploading model… ' + Math.round((snap.bytesTransferred / snap.totalBytes) * 100) + '%'),
+                                reject,
+                                resolve);
+                        });
+                        modelUrl = await getDownloadURL(task.snapshot.ref);
+                        modelFormat = fmt;
+                        showStatus('Model uploaded.');
+                    } catch (err) {
+                        console.error('CAD upload failed:', err);
+                        showStatus('Upload failed — check that Firebase Storage is enabled, or paste a model link instead.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    submitBtn.disabled = false;
+                }
+
+                newMech.modelUrl = modelUrl || '';
+                newMech.modelFormat = modelFormat || '';
+                newMech.hasCad = !!(newMech.cadUrl || newMech.modelUrl);
 
                 if (isFirebaseConnected) {
                     try {
