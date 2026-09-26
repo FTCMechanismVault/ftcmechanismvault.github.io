@@ -1729,6 +1729,11 @@
                 db = getFirestore(app);
                 try {
                     storage = getStorage(app);
+                    // The SDK retries a dead bucket for 2 minutes by default. If Storage
+                    // is not enabled on the project we want to say so quickly, not leave
+                    // the submit button disabled while it grinds.
+                    storage.maxUploadRetryTime = 20000;
+                    storage.maxOperationRetryTime = 20000;
                 } catch (e) {
                     // Storage not enabled on the project — uploads degrade to the URL field
                     storage = null;
@@ -2390,12 +2395,19 @@
                     submitBtn.disabled = true;
                     try {
                         const path = `cad-models/${newMech.id}.${ext}`;
+                        // A dead bucket emits no progress events, so say something up front
+                        // rather than leaving the form looking frozen until the retry ceiling.
+                        showStatus('Uploading model…');
                         const task = uploadBytesResumable(storageRef(storage, path), file);
                         await new Promise((resolve, reject) => {
+                            const giveUp = setTimeout(() => {
+                                try { task.cancel(); } catch (e) {}
+                                reject(new Error('upload-timeout'));
+                            }, 30000);
                             task.on('state_changed',
                                 (snap) => showStatus('Uploading model… ' + Math.round((snap.bytesTransferred / snap.totalBytes) * 100) + '%'),
-                                reject,
-                                resolve);
+                                (err) => { clearTimeout(giveUp); reject(err); },
+                                () => { clearTimeout(giveUp); resolve(); });
                         });
                         modelUrl = await getDownloadURL(task.snapshot.ref);
                         modelFormat = fmt;
