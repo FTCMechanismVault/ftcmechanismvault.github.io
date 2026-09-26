@@ -2,35 +2,82 @@ rules_version = '2';
 
 // FTC Mechanism Vault — Firestore security rules.
 //
-// The site hides the Delete button unless the current browser submitted the record,
-// but that is only a guard rail: anyone can open devtools and call deleteDoc()
-// directly. THESE RULES ARE WHAT ACTUALLY ENFORCE IT. Deploy them with:
+// The site also validates submissions in the browser, but that check runs on the
+// submitter's machine and can be skipped entirely by calling the Firestore SDK
+// directly from a console. THESE RULES ARE THE ONLY ENFORCEMENT THAT COUNTS.
 //
-//     firebase deploy --only firestore:rules
-//
-// or paste them into Firebase console → Firestore Database → Rules → Publish.
-//
-// Until they are published, the public collection is still world-writable.
+// Deploy with:
+//     npx firebase-tools deploy --only firestore:rules
+// or paste into Firebase console → Firestore Database → Rules → Publish.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---- Mechanisms (public archive) ----
+    // ---- Link safety -------------------------------------------------------
+    // Anything not http(s) is refused outright. This is what stops a submission
+    // carrying javascript:, data: or vbscript: in a field the site later puts in
+    // an href or an iframe src.
+    function safeScheme(url) {
+      return url is string && (url == '' || url.matches('https?://.*'));
+    }
+
+    // Links must point at hosts this project actually expects. Keeps the archive
+    // from being used to launder links to malware or phishing pages.
+    function allowedMedia(url) {
+      return url is string && (url == '' ||
+        url.matches('https://((www\\.|m\\.)?youtube\\.com|youtu\\.be|(www\\.)?instagram\\.com)/.*'));
+    }
+
+    function allowedCad(url) {
+      return url is string && (url == '' ||
+        url.matches('https://((cad\\.|www\\.)?onshape\\.com|(www\\.)?grabcad\\.com|(www\\.)?thingiverse\\.com|(www\\.)?printables\\.com|(www\\.)?github\\.com|raw\\.githubusercontent\\.com|gitlab\\.com|drive\\.google\\.com|(www\\.)?dropbox\\.com|a360\\.co|myhub\\.autodesk360\\.com)/.*'));
+    }
+
+    // A 3D model is fetched and parsed by the viewer, so restrict it to this
+    // site's own files, Firebase Storage, or raw GitHub.
+    function allowedModel(url) {
+      return url is string && (url == '' ||
+        url.matches('https://(firebasestorage\\.googleapis\\.com|ftcmechanismvault\\.github\\.io|raw\\.githubusercontent\\.com)/.*'));
+    }
+
+    // ---- Shape and size ----------------------------------------------------
+    // Caps exist so one submission cannot bloat the collection or push a wall of
+    // text into the page. Optional fields are read with get() so a submission
+    // that omits them is still valid.
+    function validMechanism(d) {
+      return d.team is string && d.team.size() > 0 && d.team.size() <= 80
+          && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+          && d.category is string && d.category.size() <= 40
+          && d.season is string && d.season.size() <= 60
+          && d.seasonKey is string && d.seasonKey.size() <= 20
+          && d.get('software', '') is string && d.get('software', '').size() <= 600
+          && d.get('specs', []) is list && d.get('specs', []).size() <= 12
+          && safeScheme(d.get('mediaUrl', ''))
+          && safeScheme(d.get('cadUrl', ''))
+          && safeScheme(d.get('modelUrl', ''))
+          && allowedMedia(d.get('mediaUrl', ''))
+          && allowedCad(d.get('cadUrl', ''))
+          && allowedModel(d.get('modelUrl', ''))
+          && d.size() <= 20;
+    }
+
+    // ---- Mechanisms (public archive) ---------------------------------------
     match /artifacts/{appId}/public/data/mechanisms/{mechanismId} {
 
-      // The archive is meant to be read by anyone, signed in or not.
       allow read: if true;
 
       // Anyone signed in (anonymous auth counts) may submit, but the record must
-      // carry their own uid — you cannot create a document owned by someone else.
+      // carry their own uid and pass validation.
       allow create: if request.auth != null
-                    && request.resource.data.authorUid == request.auth.uid;
+                    && request.resource.data.authorUid == request.auth.uid
+                    && validMechanism(request.resource.data);
 
-      // Only the submitter may edit their own record, and ownership cannot be
-      // reassigned in the process.
+      // Only the submitter may edit their own record, ownership cannot be
+      // reassigned, and the result must still be valid.
       allow update: if request.auth != null
                     && resource.data.authorUid == request.auth.uid
-                    && request.resource.data.authorUid == resource.data.authorUid;
+                    && request.resource.data.authorUid == resource.data.authorUid
+                    && validMechanism(request.resource.data);
 
       // Only the submitter may delete their own record. Records with no authorUid
       // — everything currently seeded — can never be deleted by a visitor.
@@ -39,11 +86,15 @@ service cloud.firestore {
                     && resource.data.authorUid == request.auth.uid;
     }
 
-    // ---- Site analytics (the view counter) ----
-    // Read by everyone; incremented by any signed-in visitor on page load.
+    // ---- Site analytics (the view counter) ---------------------------------
+    // Read by everyone; incremented by any signed-in visitor on page load. The
+    // shape is pinned so this document cannot be repurposed as free storage.
     match /artifacts/{appId}/public/data/stats/{docId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null
+                   && request.resource.data.keys().hasOnly(['websiteViews', 'viewCounterReset'])
+                   && request.resource.data.websiteViews is int
+                   && request.resource.data.websiteViews >= 0;
     }
 
     // Anything not matched above is denied.
@@ -53,8 +104,7 @@ service cloud.firestore {
 // NOTE ON SEEDING
 // ---------------
 // seedInitialData() in index.html writes the built-in sample mechanisms when the
-// collection is empty. Those records have no authorUid, so the create rule above
-// rejects them. That is deliberate: the live collection is not empty, and seed
-// records should not become deletable by whichever visitor happens to trigger the
-// seed. If you ever do want to reseed, do it from the Firebase console or a script
-// using the Admin SDK, which bypasses these rules.
+// collection is empty. Those records have no authorUid, so create rejects them.
+// That is deliberate: the live collection is not empty, and seed records should
+// not become deletable by whichever visitor happens to trigger the seed. To
+// reseed, use the Firebase console or the Admin SDK, which bypass these rules.

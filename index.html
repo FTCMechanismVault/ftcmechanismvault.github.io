@@ -1277,6 +1277,57 @@
         // All the upload code is intact and needs no other change.
         const CAD_UPLOADS_ENABLED = false;
 
+        // ---------- Untrusted content ----------
+        // Every mechanism field is submitted by the public and rendered with innerHTML,
+        // so it is escaped at the point of use. Firestore stores whatever it is given;
+        // it does not sanitise anything.
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Only http(s) survives. Blocks javascript:, data:, vbscript: and friends,
+        // which would otherwise run on click via href or on load via iframe src.
+        function safeExternalUrl(value) {
+            if (!value) return '';
+            try {
+                const url = new URL(String(value), location.origin);
+                if (url.protocol !== 'https:' && url.protocol !== 'http:') return '';
+                return url.href;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // Hosts a mechanism may point at. Extend deliberately.
+        const ALLOWED_MEDIA_HOSTS = [
+            'youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be',
+            'instagram.com', 'www.instagram.com'
+        ];
+        const ALLOWED_CAD_HOSTS = [
+            'onshape.com', 'cad.onshape.com', 'www.onshape.com',
+            'grabcad.com', 'www.grabcad.com',
+            'thingiverse.com', 'www.thingiverse.com',
+            'printables.com', 'www.printables.com',
+            'github.com', 'www.github.com', 'raw.githubusercontent.com',
+            'gitlab.com', 'drive.google.com', 'dropbox.com', 'www.dropbox.com',
+            'a360.co', 'myhub.autodesk360.com'
+        ];
+
+        function hostAllowed(value, list) {
+            try {
+                const host = new URL(value).hostname.toLowerCase();
+                return list.indexOf(host) !== -1;
+            } catch (e) {
+                return false;
+            }
+        }
+
         const BOOKMARKS_KEY = 'ftc_vault_bookmarks';
 
         // localStorage can throw in private mode or with site data blocked, so every
@@ -1359,6 +1410,8 @@
         const cadObjectCache = new Map();
 
         function loadCadObject(url, format) {
+            url = safeExternalUrl(url);
+            if (!url) return Promise.reject(new Error('Unsafe or invalid model URL'));
             const key = url;
             if (cadObjectCache.has(key)) return cadObjectCache.get(key);
 
@@ -1919,14 +1972,14 @@
                 
                 const mediaContainer = document.getElementById('modalMediaContainer');
                 if (m.youtubeId) {
-                    mediaContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${m.youtubeId}?autoplay=1" title="${m.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                    mediaContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${encodeURIComponent(m.youtubeId)}?autoplay=1" title="${escapeHtml(m.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     mediaContainer.innerHTML = `
                         <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-panel2">
                             <i class="fa-brands fa-instagram text-4xl text-violet mb-4" aria-hidden="true"></i>
                             <h3 class="h3 text-ink mb-1.5">Instagram clip</h3>
                             <p class="text-[13px] text-ink2 max-w-sm mb-5 leading-relaxed">This mechanism showcase is hosted on Instagram and opens in a new tab.</p>
-                            <a href="${m.mediaUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                            <a href="${escapeHtml(safeExternalUrl(m.mediaUrl))}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
                                 <span>Open in Instagram</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i>
                             </a>
@@ -1961,19 +2014,19 @@
 
             // Specs and text population
             const specsList = document.getElementById('modalHardwareSpecs');
-            specsList.innerHTML = (m.specs || []).map(s => `<li>${s}</li>`).join('');
+            specsList.innerHTML = (m.specs || []).map(spec => `<li>${escapeHtml(spec)}</li>`).join('');
             document.getElementById('modalSoftwareNotes').innerText = m.software || 'Standard TeleOp & Autonomous driving control setup.';
 
             const cadContainer = document.getElementById('modalCadContainer');
             if (m.hasCad && m.cadUrl) {
                 cadContainer.classList.remove('hidden');
-                document.getElementById('modalCadLink').href = m.cadUrl;
+                document.getElementById('modalCadLink').href = safeExternalUrl(m.cadUrl) || '#';
             } else {
                 cadContainer.classList.add('hidden');
             }
             
             const directLink = hasMedia ? m.mediaUrl : (m.hasCad ? m.cadUrl : '#');
-            document.getElementById('modalDirectMediaLink').href = directLink || '#';
+            document.getElementById('modalDirectMediaLink').href = safeExternalUrl(directLink) || '#';
             document.getElementById('modalDirectMediaLink').innerHTML = hasMedia
                 ? '<i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i> Open original media'
                 : '<i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i> Open CAD file';
@@ -2051,13 +2104,13 @@
                 return `
                     <article class="card card-enter group" style="animation-delay:${Math.min(idx, 11) * 45}ms">
                         <div>
-                            <div class="card__media modal-trigger" data-id="${m.id}" role="button" tabindex="0" aria-label="Inspect ${m.title.replace(/"/g, '&quot;')}">
+                            <div class="card__media modal-trigger" data-id="${escapeHtml(m.id)}" role="button" tabindex="0" aria-label="Inspect ${escapeHtml(m.title)}">
                                 <span class="card__scan"></span>
                                 ${hasCadModel(m) ? `
-                                    <canvas id="thumb-canvas-${m.id}" width="320" height="200"></canvas>
+                                    <canvas id="thumb-canvas-${escapeHtml(m.id)}" width="320" height="200"></canvas>
                                     <span class="card__marker"><i class="fa-solid fa-cube" aria-hidden="true"></i></span>
                                 ` : m.youtubeId ? `
-                                    <img src="https://img.youtube.com/vi/${m.youtubeId}/hqdefault.jpg" alt="" loading="lazy">
+                                    <img src="https://img.youtube.com/vi/${encodeURIComponent(m.youtubeId)}/hqdefault.jpg" alt="" loading="lazy">
                                     <span class="card__marker"><i class="fa-solid fa-play ml-px" aria-hidden="true"></i></span>
                                 ` : `
                                     <div class="w-full h-full flex items-center justify-center bg-panel2 text-violet">
@@ -2067,24 +2120,24 @@
                                 `}
 
                                 <div class="absolute top-2.5 left-2.5 z-[3] flex flex-wrap gap-1.5">
-                                    <span class="tag">${m.category}</span>
+                                    <span class="tag">${escapeHtml(m.category)}</span>
                                     ${hasCadModel(m) ? `<span class="tag tag--teal">3D</span>` : m.hasCad ? `<span class="tag tag--teal">CAD</span>` : ''}
                                 </div>
                             </div>
 
                             <div class="px-3.5 pt-3.5 pb-3">
-                                <h3 class="card__title line-clamp-2 cursor-pointer modal-trigger" data-id="${m.id}">${m.title}</h3>
-                                <p class="mt-1.5 text-[11.5px] text-ink3 truncate">${m.team}</p>
+                                <h3 class="card__title line-clamp-2 cursor-pointer modal-trigger" data-id="${escapeHtml(m.id)}">${escapeHtml(m.title)}</h3>
+                                <p class="mt-1.5 text-[11.5px] text-ink3 truncate">${escapeHtml(m.team)}</p>
                             </div>
                         </div>
 
                         <div class="card__foot">
-                            <p class="num text-[11px] text-ink3 shrink-0">${m.seasonKey}</p>
+                            <p class="num text-[11px] text-ink3 shrink-0">${escapeHtml(m.seasonKey)}</p>
                             <div class="flex items-center gap-1 shrink-0">
-                                <button type="button" data-id="${m.id}" aria-pressed="${isCompared}" class="compare-toggle-btn card-act ${isCompared ? 'is-on' : ''}" aria-label="${isCompared ? 'Remove from comparison' : 'Add to comparison'}">
+                                <button type="button" data-id="${escapeHtml(m.id)}" aria-pressed="${isCompared}" class="compare-toggle-btn card-act ${isCompared ? 'is-on' : ''}" aria-label="${isCompared ? 'Remove from comparison' : 'Add to comparison'}">
                                     <i class="fa-solid fa-code-compare" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-id="${m.id}" aria-pressed="${isSaved}" class="bookmark-toggle-btn card-act ${isSaved ? 'is-saved' : ''}" aria-label="${isSaved ? 'Remove bookmark' : 'Save bookmark'}">
+                                <button type="button" data-id="${escapeHtml(m.id)}" aria-pressed="${isSaved}" class="bookmark-toggle-btn card-act ${isSaved ? 'is-saved' : ''}" aria-label="${isSaved ? 'Remove bookmark' : 'Save bookmark'}">
                                     <i class="${isSaved ? 'fa-solid' : 'fa-regular'} fa-bookmark" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -2168,19 +2221,19 @@
                 compareContent.innerHTML = selectedMechs.map(m => `
                     <article class="frame panel bg-void/50 p-5 space-y-5">
                         <div>
-                            <div class="mono-label mono-label--signal text-[10px]">${m.team}</div>
-                            <h3 class="h3 text-ink mt-1.5 !text-[15px]">${m.title}</h3>
-                            <div class="mono-label text-[10px] mt-1.5">${m.season} · ${m.category}</div>
+                            <div class="mono-label mono-label--signal text-[10px]">${escapeHtml(m.team)}</div>
+                            <h3 class="h3 text-ink mt-1.5 !text-[15px]">${escapeHtml(m.title)}</h3>
+                            <div class="mono-label text-[10px] mt-1.5">${escapeHtml(m.season)} · ${escapeHtml(m.category)}</div>
                         </div>
                         <div class="border-t border-line pt-4">
                             <div class="mono-label text-[10px] mb-2.5" style="color:var(--amber)">Hardware BOM</div>
                             <ul class="space-y-1.5 text-[13px] text-ink2 list-disc list-inside marker:text-signal">
-                                ${(m.specs || []).map(spec => `<li>${spec}</li>`).join('') || '<li class="list-none text-ink3">No hardware details provided.</li>'}
+                                ${(m.specs || []).map(spec => `<li>${escapeHtml(spec)}</li>`).join('') || '<li class="list-none text-ink3">No hardware details provided.</li>'}
                             </ul>
                         </div>
                         <div class="border-t border-line pt-4">
                             <div class="mono-label mono-label--signal text-[10px] mb-2.5">Software Logic</div>
-                            <p class="text-[13px] text-ink2 leading-relaxed">${m.software || 'No software notes provided.'}</p>
+                            <p class="text-[13px] text-ink2 leading-relaxed">${escapeHtml(m.software) || 'No software notes provided.'}</p>
                         </div>
                     </article>
                 `).join('');
@@ -2315,7 +2368,7 @@
                         embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'iframewindow=true';
                     }
                     const iframe = document.createElement('iframe');
-                    iframe.src = embedUrl;
+                    iframe.src = safeExternalUrl(embedUrl);
                     iframe.className = 'w-full h-full border-0 rounded-[6px]';
                     iframe.setAttribute('title', 'Onshape CAD document');
                     container.appendChild(iframe);
@@ -2344,21 +2397,51 @@
             document.getElementById('submissionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
+                const statusPre = document.getElementById('subUploadStatus');
+                const reject = (text) => {
+                    statusPre.classList.remove('hidden');
+                    statusPre.style.color = '#FB7185';
+                    statusPre.innerText = text;
+                    return false;
+                };
+
+                // Links are checked here and again by the Firestore rules, because this
+                // check runs in the submitter's browser and can simply be skipped.
+                const rawMedia = document.getElementById('subVideoUrl').value.trim();
+                const rawCad = document.getElementById('subCadUrl').value.trim();
+
+                if (rawMedia) {
+                    const clean = safeExternalUrl(rawMedia);
+                    if (!clean) return reject('That media link is not a valid http(s) URL.');
+                    if (!hostAllowed(clean, ALLOWED_MEDIA_HOSTS)) {
+                        return reject('Media links must be YouTube or Instagram.');
+                    }
+                }
+                if (rawCad) {
+                    const clean = safeExternalUrl(rawCad);
+                    if (!clean) return reject('That CAD link is not a valid http(s) URL.');
+                    if (!hostAllowed(clean, ALLOWED_CAD_HOSTS)) {
+                        return reject('CAD links must point at Onshape, GrabCAD, Thingiverse, Printables, GitHub, GitLab, Google Drive, Dropbox or Autodesk.');
+                    }
+                }
+
+                const cap = (value, max) => String(value || '').slice(0, max);
+
                 const newMech = {
                     id: 'mech-user-' + Date.now(),
                     authorUid: (auth && auth.currentUser) ? auth.currentUser.uid : null,
                     createdAt: Date.now(),
-                    team: document.getElementById('subTeam').value,
+                    team: cap(document.getElementById('subTeam').value, 80),
                     season: document.getElementById('subSeason').value,
                     seasonKey: document.getElementById('subSeason').value.match(/\(([^)]+)\)/)?.[1] || '2026-2027',
-                    title: document.getElementById('subTitle').value,
+                    title: cap(document.getElementById('subTitle').value, 120),
                     category: document.getElementById('subCategory').value,
 
-                    mediaUrl: document.getElementById('subVideoUrl').value.trim(),
+                    mediaUrl: safeExternalUrl(rawMedia),
                     hasCad: false,
-                    cadUrl: document.getElementById('subCadUrl').value || '',
-                    specs: document.getElementById('subHardware').value.split(',').map(s => s.trim()).filter(Boolean),
-                    software: document.getElementById('subSoftware').value || 'Standard TeleOp / Autonomous driving control.'
+                    cadUrl: safeExternalUrl(rawCad),
+                    specs: document.getElementById('subHardware').value.split(',').map(x => cap(x.trim(), 80)).filter(Boolean).slice(0, 12),
+                    software: cap(document.getElementById('subSoftware').value, 600) || 'Standard TeleOp / Autonomous driving control.'
                 };
 
                 const ytMatch = newMech.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
@@ -2379,9 +2462,18 @@
                 let modelUrl = document.getElementById('subModelUrl').value.trim();
                 let modelFormat = modelUrl ? getCadFileType(modelUrl) : '';
 
-                if (modelUrl && !modelFormat) {
-                    showStatus('That model link is not a .glb, .gltf, .obj or .stl file.', 'error');
-                    return;
+                if (modelUrl) {
+                    const cleanModel = safeExternalUrl(modelUrl);
+                    if (!cleanModel) {
+                        showStatus('That model link is not a valid http(s) URL.', 'error');
+                        return;
+                    }
+                    modelUrl = cleanModel;
+                    modelFormat = getCadFileType(modelUrl);
+                    if (!modelFormat) {
+                        showStatus('That model link is not a .glb, .gltf, .obj or .stl file.', 'error');
+                        return;
+                    }
                 }
 
                 if (file) {
@@ -2466,10 +2558,10 @@
                     list.innerHTML = savedMechs.map(m => `
                         <div class="panel bg-void/50 p-3 flex items-center justify-between gap-3 hover:border-signal/45 transition-colors">
                             <div class="min-w-0">
-                                <div class="font-mono text-[10px] text-signal font-semibold truncate">${m.team}</div>
-                                <div class="text-[13px] font-semibold text-ink truncate">${m.title}</div>
+                                <div class="font-mono text-[10px] text-signal font-semibold truncate">${escapeHtml(m.team)}</div>
+                                <div class="text-[13px] font-semibold text-ink truncate">${escapeHtml(m.title)}</div>
                             </div>
-                            <button type="button" data-id="${m.id}" class="modal-trigger btn-icon !w-9 !h-9 shrink-0" aria-label="Open ${m.title.replace(/"/g, '&quot;')}">
+                            <button type="button" data-id="${escapeHtml(m.id)}" class="modal-trigger btn-icon !w-9 !h-9 shrink-0" aria-label="Open ${escapeHtml(m.title)}">
                                 <i class="fa-solid fa-arrow-right text-[11px]" aria-hidden="true"></i>
                             </button>
                         </div>
