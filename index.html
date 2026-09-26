@@ -990,7 +990,7 @@
                     <input type="text" id="subTitle" required placeholder="Active Spintake &amp; Differential Wrist" class="field">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div id="subCategoryRow" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="subCategory" class="field-label">Subsystem Category *</label>
                         <select id="subCategory" required class="field">
@@ -1001,7 +1001,7 @@
                             <option value="Full Robot">Full Robot Reveal</option>
                         </select>
                     </div>
-                    <div>
+                    <div id="subModelFileField">
                         <label for="subModelFile" class="field-label">3D model file</label>
                         <input type="file" id="subModelFile" accept=".glb,.gltf,.obj,.stl,model/gltf-binary,model/gltf+json"
                                class="field file-field">
@@ -1023,7 +1023,7 @@
                 </div>
 
                 <div>
-                    <label for="subModelUrl" class="field-label">…or link an existing 3D model file</label>
+                    <label for="subModelUrl" id="subModelUrlLabel" class="field-label">…or link an existing 3D model file</label>
                     <input type="url" id="subModelUrl" placeholder="https://…/mechanism.glb" class="field">
                     <p class="text-[11px] text-ink3 mt-1.5">Direct link to a .glb/.gltf/.obj/.stl file. The host must allow cross-origin requests.</p>
                 </div>
@@ -1269,6 +1269,14 @@
         let activeCategory = 'ALL';
         let searchQuery = '';
         let showCadOnly = false;
+        // Firebase Storage is not enabled on this project (enabling it may require the
+        // paid Blaze plan), so the in-form file picker is hidden — a control that can
+        // never succeed is worse than no control. Submitters link a hosted model
+        // instead, or a maintainer commits the file to the repo and links it.
+        // If Storage is ever enabled: flip this to true and deploy storage.rules.
+        // All the upload code is intact and needs no other change.
+        const CAD_UPLOADS_ENABLED = false;
+
         const BOOKMARKS_KEY = 'ftc_vault_bookmarks';
 
         // localStorage can throw in private mode or with site data blocked, so every
@@ -2360,7 +2368,7 @@
                 const submitBtn = document.getElementById('submitFormBtn');
                 const statusEl = document.getElementById('subUploadStatus');
                 const fileInput = document.getElementById('subModelFile');
-                const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+                const file = (CAD_UPLOADS_ENABLED && fileInput && fileInput.files) ? fileInput.files[0] : null;
 
                 const showStatus = (text, tone) => {
                     statusEl.classList.remove('hidden');
@@ -2527,6 +2535,15 @@
                 filterAndRenderGrid();
                 syncModalBookmarkButton();
             });
+
+            if (!CAD_UPLOADS_ENABLED) {
+                const fileField = document.getElementById('subModelFileField');
+                if (fileField) fileField.remove();
+                const row = document.getElementById('subCategoryRow');
+                if (row) row.className = 'grid grid-cols-1 gap-4';
+                const urlLabel = document.getElementById('subModelUrlLabel');
+                if (urlLabel) urlLabel.textContent = '3D model file URL';
+            }
 
             // Bookmarks now survive a reload, so the badge has to reflect them on load
             updateBookmarksBadge();
